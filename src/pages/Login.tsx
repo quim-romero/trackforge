@@ -1,11 +1,15 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "../auth/supabaseClient";
+import { useAuth } from "../auth/useAuth";
+import { useNavigate } from "react-router-dom";
 
 export default function Login() {
+  const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,6 +23,16 @@ export default function Login() {
     } else {
       setMessage("Check your inbox. The magic link is on its way.");
     }
+  };
+
+  const handleDemoLogin = () => {
+    const demoUser = {
+      id: "demo-user",
+      email: "demo@trackforge.app",
+    };
+    localStorage.setItem("demo-user", JSON.stringify(demoUser));
+    setUser(demoUser);
+    navigate("/dashboard");
   };
 
   return (
@@ -57,22 +71,40 @@ export default function Login() {
             />
           </div>
 
-          <button
-            type="submit"
-            className="w-full py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-md"
-          >
-            Send Magic Link
-          </button>
-
+          {error && (
+            <p className="text-sm text-red-500 text-center" role="alert">
+              {error}
+            </p>
+          )}
           {message && (
-            <p className="text-sm text-green-600 dark:text-green-400">
+            <p
+              className="text-sm text-green-600 dark:text-green-400 text-center"
+              role="status"
+            >
               {message}
             </p>
           )}
-          {error && (
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-          )}
+
+          <button
+            type="submit"
+            className="w-full bg-brand text-white px-4 py-2 rounded-md hover:bg-brand-dark transition text-sm font-medium"
+          >
+            Send magic link
+          </button>
         </form>
+
+        <div className="pt-2">
+          <button
+            onClick={handleDemoLogin}
+            className="w-full text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+          >
+            👀 Enter as demo
+          </button>
+        </div>
+
+        <footer className="text-xs text-gray-400 pt-4 italic">
+          Built for makers. Not for tourists.
+        </footer>
       </motion.div>
     </main>
   );
