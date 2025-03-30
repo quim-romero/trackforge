@@ -5,3 +5,11 @@
 html {
   font-family: "Inter", sans-serif;
 }
+
+html.no-anim *,
+html.no-anim *::before,
+html.no-anim *::after {
+  animation: none !important;
+  transition: none !important;
+  scroll-behavior: auto !important;
+}
