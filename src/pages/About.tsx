@@ -18,6 +18,7 @@ export default function About() {
             Built by someone who can’t stand noise.
           </p>
         </header>
+
         <section className="space-y-4 text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
           <p>
             This didn’t start as a product. It started as a tool for myself — a
@@ -28,6 +29,28 @@ export default function About() {
             move fast. That get out of the way.
           </p>
         </section>
+
+        <section className="space-y-4 text-base sm:text-lg text-gray-600 dark:text-gray-400 leading-relaxed">
+          <p>
+            TrackForge is for people who treat focus like an art form. Who
+            choose their tools like they choose their instruments.
+          </p>
+          <p>
+            It won’t tell you what to do. It will hold the space for you to do
+            it well.
+          </p>
+          <p>I made it because I needed it. Maybe you do too.</p>
+          <p className="italic">— Quim</p>
+        </section>
+
+        <div>
+          <Link
+            to="/"
+            className="inline-block mt-6 text-sm text-brand hover:underline"
+          >
+            ← Back to flow
+          </Link>
+        </div>
       </motion.div>
     </main>
   );
