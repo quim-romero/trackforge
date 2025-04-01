@@ -1,11 +1,15 @@
 import { useSettingsStore } from "../store/useSettingsStore";
 import { useTaskStore } from "../hooks/useTaskStore";
+import { useAuth } from "../auth/useAuth";
+import { useUserStore } from "../store/useUserStore";
 import { motion } from "framer-motion";
 
 export default function Dashboard() {
   const density = useSettingsStore((state) => state.density);
   const animationsEnabled = useSettingsStore((state) => state.animations);
   const { tasks, loading } = useTaskStore();
+  const { user } = useAuth();
+  const { name } = useUserStore();
 
   const padding = density === "compact" ? "p-2" : "p-6";
   const gap = density === "compact" ? "gap-2" : "gap-6";
@@ -78,8 +82,13 @@ export default function Dashboard() {
     <div className={spacing}>
       <header>
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-          Welcome back 👋
+          Welcome back, {name} 👋
         </h2>
+        {user?.id === "demo-user" && (
+          <p className={`${textSize} text-brand font-medium mt-1`}>
+            You're viewing the demo version.
+          </p>
+        )}
         <p className={`${textSize} text-gray-600 dark:text-gray-400 mt-1`}>
           A quick overview of your performance.
         </p>
