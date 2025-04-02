@@ -1,25 +1,14 @@
 import { useState } from "react";
-import { motion } from "framer-motion";
 import TaskCard from "../components/TaskCard";
 import AddTaskModal from "../components/AddTaskModal";
 import { useTaskStore } from "../hooks/useTaskStore";
 import { useSettingsStore } from "../store/useSettingsStore";
-
-interface Task {
-  id: string;
-  title: string;
-  description: string;
-  priority: "low" | "medium" | "high";
-  completed: boolean;
-}
+import type { Task } from "../types";
+import { motion } from "framer-motion";
 
 export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Partial<Task> | null>(null);
-
-  const { tasks, loading, toggleTask, deleteTask } = useTaskStore();
-  const { density, animations } = useSettingsStore();
-
   const [statusFilter, setStatusFilter] = useState<
     "all" | "completed" | "active"
   >("all");
@@ -27,14 +16,18 @@ export default function Tasks() {
     "all" | "low" | "medium" | "high"
   >("all");
 
-  const filterPadding =
-    density === "compact" ? "py-1 px-2 text-xs" : "py-2 px-3 text-sm";
+  const { tasks, loading, toggleTask, deleteTask } = useTaskStore();
+  const density = useSettingsStore((state) => state.density);
+  const animations = useSettingsStore((state) => state.animations);
+
   const layoutSpacing = density === "compact" ? "space-y-2" : "space-y-8";
   const cardGridGap = density === "compact" ? "gap-2" : "gap-6";
+  const filterPadding =
+    density === "compact" ? "py-1 px-2 text-xs" : "py-2 px-3 text-sm";
 
   const handleCloseModal = () => {
-    setIsModalOpen(false);
     setEditingTask(null);
+    setIsModalOpen(false);
   };
 
   const filteredTasks = tasks.filter((task) => {
@@ -42,8 +35,10 @@ export default function Tasks() {
       statusFilter === "all" ||
       (statusFilter === "completed" && task.completed) ||
       (statusFilter === "active" && !task.completed);
+
     const priorityMatch =
       priorityFilter === "all" || task.priority === priorityFilter;
+
     return statusMatch && priorityMatch;
   });
 
@@ -102,21 +97,6 @@ export default function Tasks() {
         </div>
       </div>
 
-      <AddTaskModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        defaultValues={
-          editingTask
-            ? {
-                id: editingTask.id,
-                title: editingTask.title ?? "",
-                description: editingTask.description ?? "",
-                priority: editingTask.priority ?? "medium",
-              }
-            : undefined
-        }
-      />
-
       {loading ? (
         <div
           className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 ${cardGridGap}`}
@@ -154,6 +134,21 @@ export default function Tasks() {
           ))}
         </section>
       )}
+
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        defaultValues={
+          editingTask
+            ? {
+                id: editingTask.id,
+                title: editingTask.title ?? "",
+                description: editingTask.description ?? "",
+                priority: editingTask.priority ?? "medium",
+              }
+            : undefined
+        }
+      />
     </div>
   );
 
