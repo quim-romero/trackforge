@@ -2,15 +2,17 @@ import { useState } from "react";
 import TaskCard from "../components/TaskCard";
 import AddTaskModal from "../components/AddTaskModal";
 import { motion } from "framer-motion";
+import { useTaskStore } from "../hooks/useTaskStore";
 
 export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const { tasks, loading, toggleTask, deleteTask } = useTaskStore();
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
   };
 
-  const content = (
+  return (
     <div className="space-y-8">
       <header className="flex justify-between items-center">
         <div>
@@ -28,8 +30,23 @@ export default function Tasks() {
           + New Task
         </button>
       </header>
+
+      {isModalOpen && <AddTaskModal onClose={handleCloseModal} />}
+
+      {loading ? (
+        <p className="text-gray-500 dark:text-gray-400">Loading tasks...</p>
+      ) : (
+        <div className="space-y-4">
+          {tasks.map((task) => (
+            <TaskCard
+              key={task.id}
+              task={task}
+              onToggle={() => toggleTask(task.id)}
+              onDelete={() => deleteTask(task.id)}
+            />
+          ))}
+        </div>
+      )}
     </div>
   );
-
-  return <>{content}</>;
 }
