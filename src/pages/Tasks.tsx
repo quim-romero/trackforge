@@ -6,6 +6,7 @@ import { useSettingsStore } from "../store/useSettingsStore";
 
 export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
   const { tasks, loading, toggleTask, deleteTask } = useTaskStore();
   const { density } = useSettingsStore();
 
@@ -18,22 +19,26 @@ export default function Tasks() {
 
   const filterPadding =
     density === "compact" ? "py-1 px-2 text-xs" : "py-2 px-3 text-sm";
+  const layoutSpacing = density === "compact" ? "space-y-2" : "space-y-8";
+  const cardGridGap = density === "compact" ? "gap-2" : "gap-6";
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
+    setEditingTask(null);
   };
 
   const filteredTasks = tasks.filter((task) => {
-    const matchesStatus =
+    const statusMatch =
       statusFilter === "all" ||
-      (statusFilter === "completed" ? task.completed : !task.completed);
-    const matchesPriority =
+      (statusFilter === "completed" && task.completed) ||
+      (statusFilter === "active" && !task.completed);
+    const priorityMatch =
       priorityFilter === "all" || task.priority === priorityFilter;
-    return matchesStatus && matchesPriority;
+    return statusMatch && priorityMatch;
   });
 
   return (
-    <div className="space-y-8">
+    <div className={layoutSpacing}>
       <header className="flex justify-between items-center">
         <div>
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
@@ -84,21 +89,46 @@ export default function Tasks() {
         </div>
       </div>
 
-      {isModalOpen && <AddTaskModal onClose={handleCloseModal} />}
+      {isModalOpen && (
+        <AddTaskModal onClose={handleCloseModal} task={editingTask} />
+      )}
 
       {loading ? (
-        <p className="text-gray-500 dark:text-gray-400">Loading tasks...</p>
-      ) : (
-        <div className="space-y-4">
-          {filteredTasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              onToggle={() => toggleTask(task.id)}
-              onDelete={() => deleteTask(task.id)}
+        <div
+          className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 ${cardGridGap}`}
+        >
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="h-28 rounded-xl border border-gray-300 dark:border-gray-700 bg-gray-100 dark:bg-gray-800 animate-pulse"
             />
           ))}
         </div>
+      ) : filteredTasks.length === 0 ? (
+        <p className="text-gray-500 dark:text-gray-400 text-sm mt-10 italic text-center">
+          Nothing to show. You’re either done or filtering too hard.
+        </p>
+      ) : (
+        <section
+          className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 ${cardGridGap}`}
+        >
+          {filteredTasks.map((task) => (
+            <div key={task.id}>
+              <TaskCard
+                title={task.title}
+                description={task.description}
+                priority={task.priority}
+                completed={task.completed}
+                onToggle={() => toggleTask(task.id)}
+                onDelete={() => deleteTask(task.id)}
+                onEdit={() => {
+                  setEditingTask(task);
+                  setIsModalOpen(true);
+                }}
+              />
+            </div>
+          ))}
+        </section>
       )}
     </div>
   );
