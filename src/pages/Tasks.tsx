@@ -4,9 +4,18 @@ import AddTaskModal from "../components/AddTaskModal";
 import { useTaskStore } from "../hooks/useTaskStore";
 import { useSettingsStore } from "../store/useSettingsStore";
 
+interface Task {
+  id: string;
+  title: string;
+  description: string;
+  priority: "low" | "medium" | "high";
+  completed: boolean;
+}
+
 export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [editingTask, setEditingTask] = useState(null);
+  const [editingTask, setEditingTask] = useState<Partial<Task> | null>(null);
+
   const { tasks, loading, toggleTask, deleteTask } = useTaskStore();
   const { density } = useSettingsStore();
 
@@ -49,7 +58,10 @@ export default function Tasks() {
           </p>
         </div>
         <button
-          onClick={() => setIsModalOpen(true)}
+          onClick={() => {
+            setEditingTask(null);
+            setIsModalOpen(true);
+          }}
           className="px-4 py-2 text-sm bg-brand text-white rounded-lg hover:bg-brand-dark transition"
         >
           + New Task
@@ -89,9 +101,20 @@ export default function Tasks() {
         </div>
       </div>
 
-      {isModalOpen && (
-        <AddTaskModal onClose={handleCloseModal} task={editingTask} />
-      )}
+      <AddTaskModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        defaultValues={
+          editingTask
+            ? {
+                id: editingTask.id,
+                title: editingTask.title ?? "",
+                description: editingTask.description ?? "",
+                priority: editingTask.priority ?? "medium",
+              }
+            : undefined
+        }
+      />
 
       {loading ? (
         <div
