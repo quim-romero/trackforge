@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { motion } from "framer-motion";
 import TaskCard from "../components/TaskCard";
 import AddTaskModal from "../components/AddTaskModal";
 import { useTaskStore } from "../hooks/useTaskStore";
@@ -17,7 +18,7 @@ export default function Tasks() {
   const [editingTask, setEditingTask] = useState<Partial<Task> | null>(null);
 
   const { tasks, loading, toggleTask, deleteTask } = useTaskStore();
-  const { density } = useSettingsStore();
+  const { density, animations } = useSettingsStore();
 
   const [statusFilter, setStatusFilter] = useState<
     "all" | "completed" | "active"
@@ -46,7 +47,7 @@ export default function Tasks() {
     return statusMatch && priorityMatch;
   });
 
-  return (
+  const content = (
     <div className={layoutSpacing}>
       <header className="flex justify-between items-center">
         <div>
@@ -154,5 +155,17 @@ export default function Tasks() {
         </section>
       )}
     </div>
+  );
+
+  return animations ? (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
+      {content}
+    </motion.div>
+  ) : (
+    content
   );
 }
