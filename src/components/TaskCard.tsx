@@ -1,5 +1,4 @@
 import { useSettingsStore } from "../store/useSettingsStore";
-import { useState } from "react";
 import { Check } from "lucide-react";
 
 type TaskCardProps = {
@@ -36,7 +35,15 @@ export default function TaskCard({
         >
           {completed && <Check className={`${checkIconSize} text-white`} />}
         </button>
-        <h4 className={`font-medium ${titleSize}`}>{title}</h4>
+        <h4
+          className={`font-medium ${titleSize} transition ${
+            completed
+              ? "line-through text-gray-400 dark:text-gray-500"
+              : "text-gray-800 dark:text-gray-100"
+          }`}
+        >
+          {title}
+        </h4>
       </div>
     </div>
   );
