@@ -8,6 +8,7 @@ type TaskCardProps = {
   onToggle?: () => void;
   onEdit?: () => void;
   onDelete?: () => void;
+  priority?: "low" | "medium" | "high";
 };
 
 export default function TaskCard({
@@ -16,6 +17,7 @@ export default function TaskCard({
   onToggle,
   onEdit,
   onDelete,
+  priority,
 }: TaskCardProps) {
   const density = useSettingsStore((state) => state.density);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -26,11 +28,26 @@ export default function TaskCard({
   const checkIconSize = density === "compact" ? "w-2.5 h-2.5" : "w-3 h-3";
   const iconSize = density === "compact" ? "w-4 h-4" : "w-5 h-5";
 
+  const priorityColor = {
+    low: "bg-green-500",
+    medium: "bg-yellow-500",
+    high: "bg-red-500",
+  }[priority];
+
   return (
     <div className="relative">
       <div
         className={`group bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${padding} flex flex-col ${gap}`}
       >
+        {priority && (
+          <div className="absolute top-3 right-3 flex items-center gap-1">
+            <span
+              className={`w-2 h-2 rounded-full ${priorityColor}`}
+              title={`Priority: ${priority}`}
+            />
+          </div>
+        )}
+
         <div className="flex items-start justify-between">
           <div className="flex items-start gap-2">
             <button
