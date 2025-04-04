@@ -1,12 +1,25 @@
 import { X } from "lucide-react";
 
+type FormData = {
+  title: string;
+  description?: string;
+  priority: "low" | "medium" | "high";
+};
+
 type AddTaskModalProps = {
   isOpen: boolean;
   onClose: () => void;
+  defaultValues?: FormData & { id?: string };
 };
 
-export default function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
+export default function AddTaskModal({
+  isOpen,
+  onClose,
+  defaultValues,
+}: AddTaskModalProps) {
   if (!isOpen) return null;
+
+  const isEditMode = !!defaultValues?.id;
 
   return (
     <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center">
@@ -20,7 +33,7 @@ export default function AddTaskModal({ isOpen, onClose }: AddTaskModalProps) {
         </button>
 
         <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-          New Task
+          {isEditMode ? "Edit Task" : "New Task"}
         </h3>
       </div>
     </div>
