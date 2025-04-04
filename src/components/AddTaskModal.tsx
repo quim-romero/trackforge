@@ -1,8 +1,9 @@
 import { X } from "lucide-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import { useTaskStore } from "../hooks/useTaskStore";
 
 const schema = z.object({
   title: z.string().min(1, "Title is required"),
@@ -16,22 +17,22 @@ type AddTaskModalProps = {
   isOpen: boolean;
   onClose: () => void;
   defaultValues?: FormData & { id?: string };
-  onSubmit?: (data: FormData) => void;
 };
 
 export default function AddTaskModal({
   isOpen,
   onClose,
   defaultValues,
-  onSubmit,
 }: AddTaskModalProps) {
   const isEditMode = !!defaultValues?.id;
+  const { addTask, updateTask } = useTaskStore();
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<FormData>({
     resolver: zodResolver(schema),
     defaultValues: defaultValues || {
@@ -53,10 +54,14 @@ export default function AddTaskModal({
     }
   }, [isOpen, defaultValues, reset]);
 
-  const handleFormSubmit = (data: FormData) => {
-    if (onSubmit) {
-      onSubmit(data);
+  const onSubmit = async (data: FormData) => {
+    setSubmitting(true);
+    if (isEditMode && defaultValues?.id) {
+      await updateTask(defaultValues.id, data);
+    } else {
+      await addTask({ ...data, completed: false });
     }
+    setSubmitting(false);
     onClose();
   };
 
@@ -80,7 +85,7 @@ export default function AddTaskModal({
           {isEditMode ? "Edit Task" : "New Task"}
         </h3>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
           <div>
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Title
@@ -90,7 +95,7 @@ export default function AddTaskModal({
               {...register("title")}
               className="w-full rounded-md px-3 py-2 text-sm border bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand"
               placeholder="Task title"
-              disabled={isSubmitting}
+              disabled={submitting}
             />
             {errors.title && (
               <p className="text-sm text-red-500 mt-1">
@@ -106,6 +111,7 @@ export default function AddTaskModal({
             <textarea
               {...register("description")}
               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              disabled={submitting}
             />
           </div>
 
@@ -116,6 +122,7 @@ export default function AddTaskModal({
             <select
               {...register("priority")}
               className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+              disabled={submitting}
             >
               <option value="low">Low</option>
               <option value="medium">Medium</option>
@@ -123,13 +130,19 @@ export default function AddTaskModal({
             </select>
           </div>
 
-          <div className="flex justify-end">
+          <div className="pt-2">
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition"
-              disabled={isSubmitting}
+              disabled={submitting}
+              className="w-full bg-brand text-white px-4 py-2 rounded-md hover:bg-brand-dark transition"
             >
-              {isEditMode ? "Save Changes" : "Add Task"}
+              {submitting
+                ? isEditMode
+                  ? "Saving..."
+                  : "Creating..."
+                : isEditMode
+                ? "Save Changes"
+                : "Create Task"}
             </button>
           </div>
         </form>
