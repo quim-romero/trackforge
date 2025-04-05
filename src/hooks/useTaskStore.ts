@@ -108,6 +108,46 @@ export function useTaskStore() {
     }
   };
 
+  const toggleTask = async (id: string) => {
+    if (isDemo) {
+      setTasks((prev) =>
+        prev.map((task) =>
+          task.id === id ? { ...task, completed: !task.completed } : task
+        )
+      );
+      return;
+    }
+
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
+
+    const { error } = await supabase
+      .from("tasks")
+      .update({ completed: !task.completed })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error toggling task:", error);
+    } else {
+      fetchTasks();
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    if (isDemo) {
+      setTasks((prev) => prev.filter((t) => t.id !== id));
+      return;
+    }
+
+    const { error } = await supabase.from("tasks").delete().eq("id", id);
+
+    if (error) {
+      console.error("Error deleting task:", error);
+    } else {
+      fetchTasks();
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
   }, [user?.id]);
@@ -117,5 +157,7 @@ export function useTaskStore() {
     loading,
     fetchTasks,
     addTask,
+    toggleTask,
+    deleteTask,
   };
 }
