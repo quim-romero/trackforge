@@ -148,6 +148,28 @@ export function useTaskStore() {
     }
   };
 
+  const updateTask = async (id: string, updated: Partial<Task>) => {
+    if (isDemo) {
+      setTasks((prev) =>
+        prev.map((task) => (task.id === id ? { ...task, ...updated } : task))
+      );
+      return;
+    }
+
+    const { createdAt, ...updatePayload } = updated;
+
+    const { error } = await supabase
+      .from("tasks")
+      .update(updatePayload)
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error updating task:", error);
+    } else {
+      fetchTasks();
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
   }, [user?.id]);
@@ -159,5 +181,6 @@ export function useTaskStore() {
     addTask,
     toggleTask,
     deleteTask,
+    updateTask,
   };
 }
