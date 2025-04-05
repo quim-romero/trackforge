@@ -82,6 +82,32 @@ export function useTaskStore() {
     setLoading(false);
   };
 
+  const addTask = async (task: Omit<Task, "id" | "createdAt">) => {
+    if (!user) return;
+
+    if (isDemo) {
+      const newTask: Task = {
+        ...task,
+        id: crypto.randomUUID(),
+        createdAt: new Date().toISOString(),
+        completed: false,
+      };
+      setTasks((prev) => [newTask, ...prev]);
+      return;
+    }
+
+    const { error } = await supabase.from("tasks").insert({
+      ...task,
+      user_id: user.id,
+    });
+
+    if (error) {
+      console.error("Error adding task:", error);
+    } else {
+      fetchTasks();
+    }
+  };
+
   useEffect(() => {
     fetchTasks();
   }, [user?.id]);
@@ -90,5 +116,6 @@ export function useTaskStore() {
     tasks,
     loading,
     fetchTasks,
+    addTask,
   };
 }
