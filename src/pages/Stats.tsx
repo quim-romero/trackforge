@@ -55,7 +55,34 @@ export default function Stats() {
       </header>
 
       <div className="bg-white dark:bg-gray-800 p-4 rounded-md shadow">
-        <Bar data={data} />
+        <div className="relative w-full h-[300px] sm:h-[360px] md:h-[420px] lg:h-[480px]">
+          <Bar
+            data={data}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              plugins: {
+                legend: { display: false },
+              },
+              scales: {
+                y: {
+                  ticks: {
+                    color: "#9CA3AF",
+                    stepSize: 1,
+                    precision: 0,
+                  },
+                  grid: {
+                    color: "#E5E7EB22",
+                  },
+                },
+                x: {
+                  ticks: { color: "#9CA3AF" },
+                  grid: { display: false },
+                },
+              },
+            }}
+          />
+        </div>
       </div>
     </div>
   );
