@@ -3,6 +3,17 @@ import { useSettingsStore } from "../store/useSettingsStore";
 import { useTaskStore } from "../hooks/useTaskStore";
 import { useMemo } from "react";
 import dayjs from "dayjs";
+import {
+  Chart as ChartJS,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import { Bar } from "react-chartjs-2";
+
+ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default function Stats() {
   const animationsEnabled = useSettingsStore((state) => state.animations);
@@ -32,8 +43,6 @@ export default function Stats() {
     };
   }, [tasks]);
 
-  console.log(data);
-
   const content = (
     <div className="space-y-6">
       <header>
@@ -44,6 +53,10 @@ export default function Stats() {
           A visual snapshot of your recent momentum.
         </p>
       </header>
+
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-md shadow">
+        <Bar data={data} />
+      </div>
     </div>
   );
 
