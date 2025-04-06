@@ -17,7 +17,7 @@ ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default function Stats() {
   const animationsEnabled = useSettingsStore((state) => state.animations);
-  const { tasks } = useTaskStore();
+  const { tasks, loading } = useTaskStore();
 
   const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
@@ -43,6 +43,12 @@ export default function Stats() {
     };
   }, [tasks]);
 
+  if (loading) {
+    return (
+      <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-700 animate-pulse" />
+    );
+  }
+
   const content = (
     <div className="space-y-6">
       <header>
@@ -54,48 +60,51 @@ export default function Stats() {
         </p>
       </header>
 
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-md shadow">
-        <div className="relative w-full h-[300px] sm:h-[360px] md:h-[420px] lg:h-[480px]">
-          <Bar
-            data={data}
-            options={{
-              responsive: true,
-              maintainAspectRatio: false,
-              plugins: {
-                legend: { display: false },
-              },
-              scales: {
-                y: {
-                  ticks: {
-                    color: "#9CA3AF",
-                    stepSize: 1,
-                    precision: 0,
-                  },
-                  grid: {
-                    color: "#E5E7EB22",
-                  },
+      <div className="relative w-full h-[300px] sm:h-[360px] md:h-[420px] lg:h-[480px]">
+        <Bar
+          data={data}
+          options={{
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+              legend: { display: false },
+            },
+            scales: {
+              y: {
+                ticks: {
+                  color: "#9CA3AF",
+                  stepSize: 1,
+                  precision: 0,
                 },
-                x: {
-                  ticks: { color: "#9CA3AF" },
-                  grid: { display: false },
+                grid: {
+                  color: "#E5E7EB22",
                 },
               },
-            }}
-          />
-        </div>
+              x: {
+                ticks: { color: "#9CA3AF" },
+                grid: { display: false },
+              },
+            },
+          }}
+        />
       </div>
     </div>
   );
 
-  return animationsEnabled ? (
+  const container = animationsEnabled ? (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.5, ease: "easeOut" }}
+      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 w-full max-w-5xl mx-auto"
     >
       {content}
     </motion.div>
   ) : (
-    content
+    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 w-full max-w-5xl mx-auto">
+      {content}
+    </div>
   );
+
+  return container;
 }
