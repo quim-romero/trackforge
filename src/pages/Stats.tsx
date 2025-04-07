@@ -60,51 +60,60 @@ export default function Stats() {
         </p>
       </header>
 
-      <div className="relative w-full h-[300px] sm:h-[360px] md:h-[420px] lg:h-[480px]">
-        <Bar
-          data={data}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-            },
-            scales: {
-              y: {
-                ticks: {
-                  color: "#9CA3AF",
-                  stepSize: 1,
-                  precision: 0,
+      {loading ? (
+        <div className="h-64 bg-gray-100 dark:bg-gray-800 rounded-xl border border-gray-300 dark:border-gray-700 animate-pulse" />
+      ) : (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+          className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 w-full max-w-5xl mx-auto"
+        >
+          <div className="relative w-full h-[300px] sm:h-[360px] md:h-[420px] lg:h-[480px]">
+            <Bar
+              data={data}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: animationsEnabled
+                  ? { duration: 600, easing: "easeOutQuart" }
+                  : false,
+                plugins: {
+                  legend: { display: false },
                 },
-                grid: {
-                  color: "#E5E7EB22",
+                scales: {
+                  y: {
+                    ticks: {
+                      color: "#9CA3AF",
+                      stepSize: 1,
+                      precision: 0,
+                    },
+                    grid: {
+                      color: "#E5E7EB22",
+                    },
+                  },
+                  x: {
+                    ticks: { color: "#9CA3AF" },
+                    grid: { display: false },
+                  },
                 },
-              },
-              x: {
-                ticks: { color: "#9CA3AF" },
-                grid: { display: false },
-              },
-            },
-          }}
-        />
-      </div>
+              }}
+            />
+          </div>
+        </motion.div>
+      )}
     </div>
   );
 
-  const container = animationsEnabled ? (
+  return animationsEnabled ? (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 w-full max-w-5xl mx-auto"
+      transition={{ duration: 0.4, ease: "easeOut" }}
     >
       {content}
     </motion.div>
   ) : (
-    <div className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm p-4 w-full max-w-5xl mx-auto">
-      {content}
-    </div>
+    content
   );
-
-  return container;
 }
