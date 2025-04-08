@@ -17,6 +17,8 @@ export default function Profile() {
   const spacing = density === "compact" ? "space-y-3" : "space-y-6";
   const textSize = density === "compact" ? "text-sm" : "text-base";
   const labelSize = density === "compact" ? "text-xs" : "text-sm";
+  const inputPadding =
+    density === "compact" ? "px-2 py-1 text-sm" : "px-3 py-2 text-sm";
 
   const handleSave = () => {
     if (newName.trim()) {
@@ -36,43 +38,62 @@ export default function Profile() {
         </p>
       </header>
 
-      <div>
-        <label
-          className={`${labelSize} font-medium text-gray-700 dark:text-gray-300`}
-        >
-          Display Name
-        </label>
-        <div className="mt-2 flex gap-2 items-center">
-          {editing ? (
-            <>
-              <input
-                type="text"
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="flex-1 border rounded-md bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand outline-none px-3 py-2 text-sm"
-              />
-              <button
-                onClick={handleSave}
-                className="px-3 py-1 text-sm bg-brand text-white rounded-md hover:bg-brand-dark transition"
-              >
-                Save
-              </button>
-            </>
-          ) : (
-            <>
-              <span className={`text-gray-900 dark:text-gray-100 ${textSize}`}>
-                {name}
-              </span>
-              <button
-                onClick={() => setEditing(true)}
-                className={`${labelSize} text-brand hover:underline`}
-              >
-                Edit
-              </button>
-            </>
-          )}
+      <section
+        className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${padding} ${spacing}`}
+      >
+        <div>
+          <label
+            className={`${labelSize} font-medium text-gray-700 dark:text-gray-300`}
+          >
+            Display Name
+          </label>
+          <div className="mt-2 flex gap-2 items-center">
+            {editing ? (
+              <>
+                <input
+                  type="text"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className={`flex-1 border rounded-md bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand outline-none ${inputPadding}`}
+                />
+                <button
+                  onClick={handleSave}
+                  className="px-3 py-1 text-sm bg-brand text-white rounded-md hover:bg-brand-dark transition"
+                >
+                  Save
+                </button>
+              </>
+            ) : (
+              <>
+                <span
+                  className={`text-gray-900 dark:text-gray-100 ${textSize}`}
+                >
+                  {name}
+                </span>
+                <button
+                  onClick={() => setEditing(true)}
+                  className={`${labelSize} text-brand hover:underline`}
+                >
+                  Edit
+                </button>
+              </>
+            )}
+          </div>
         </div>
-      </div>
+
+        <div>
+          <label
+            className={`${labelSize} font-medium text-gray-700 dark:text-gray-300`}
+          >
+            Current Theme
+          </label>
+          <p
+            className={`${labelSize} mt-1 text-gray-600 dark:text-gray-400 capitalize`}
+          >
+            {theme}
+          </p>
+        </div>
+      </section>
     </div>
   );
 
