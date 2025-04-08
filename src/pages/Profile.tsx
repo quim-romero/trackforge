@@ -1,30 +1,80 @@
-import { useState } from "react"
-import { useUserStore } from "../store/useUserStore"
-import { useThemeStore } from "../store/useThemeStore"
-import { useSettingsStore } from "../store/useSettingsStore"
-import { motion } from "framer-motion"
+import { useState } from "react";
+import { useUserStore } from "../store/useUserStore";
+import { useThemeStore } from "../store/useThemeStore";
+import { useSettingsStore } from "../store/useSettingsStore";
+import { motion } from "framer-motion";
 
 export default function Profile() {
-  const { name } = useUserStore()
-  const { theme } = useThemeStore()
-  const density = useSettingsStore((state) => state.density)
-  const animations = useSettingsStore((state) => state.animations)
+  const { name, setName } = useUserStore();
+  const { theme } = useThemeStore();
+  const density = useSettingsStore((state) => state.density);
+  const animations = useSettingsStore((state) => state.animations);
 
-  const padding = density === "compact" ? "p-3" : "p-6"
-  const spacing = density === "compact" ? "space-y-3" : "space-y-6"
-  const textSize = density === "compact" ? "text-sm" : "text-base"
-  const labelSize = density === "compact" ? "text-xs" : "text-sm"
+  const [editing, setEditing] = useState(false);
+  const [newName, setNewName] = useState(name);
+
+  const padding = density === "compact" ? "p-3" : "p-6";
+  const spacing = density === "compact" ? "space-y-3" : "space-y-6";
+  const textSize = density === "compact" ? "text-sm" : "text-base";
+  const labelSize = density === "compact" ? "text-xs" : "text-sm";
+
+  const handleSave = () => {
+    if (newName.trim()) {
+      setName(newName.trim());
+      setEditing(false);
+    }
+  };
 
   const content = (
     <div className={`${spacing} max-w-lg`}>
       <header>
-        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">Profile</h2>
+        <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+          Profile
+        </h2>
         <p className={`${labelSize} text-gray-500 dark:text-gray-400`}>
           Manage your personal preferences.
         </p>
       </header>
+
+      <div>
+        <label
+          className={`${labelSize} font-medium text-gray-700 dark:text-gray-300`}
+        >
+          Display Name
+        </label>
+        <div className="mt-2 flex gap-2 items-center">
+          {editing ? (
+            <>
+              <input
+                type="text"
+                value={newName}
+                onChange={(e) => setNewName(e.target.value)}
+                className="flex-1 border rounded-md bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-brand outline-none px-3 py-2 text-sm"
+              />
+              <button
+                onClick={handleSave}
+                className="px-3 py-1 text-sm bg-brand text-white rounded-md hover:bg-brand-dark transition"
+              >
+                Save
+              </button>
+            </>
+          ) : (
+            <>
+              <span className={`text-gray-900 dark:text-gray-100 ${textSize}`}>
+                {name}
+              </span>
+              <button
+                onClick={() => setEditing(true)}
+                className={`${labelSize} text-brand hover:underline`}
+              >
+                Edit
+              </button>
+            </>
+          )}
+        </div>
+      </div>
     </div>
-  )
+  );
 
   return animations ? (
     <motion.div
@@ -36,5 +86,5 @@ export default function Profile() {
     </motion.div>
   ) : (
     content
-  )
+  );
 }
