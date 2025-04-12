@@ -3,6 +3,7 @@ import { useTaskStore } from "../hooks/useTaskStore";
 import { useAuth } from "../auth/useAuth";
 import { useUserStore } from "../store/useUserStore";
 import { motion } from "framer-motion";
+import { useBusinessStore } from "../store/useBusinessStore";
 
 export default function Dashboard() {
   const { tasks, loading } = useTaskStore();
@@ -33,6 +34,29 @@ export default function Dashboard() {
     { label: "Productivity", value: `${productivity}%` },
   ];
 
+  const { businessMode, clients, projects } = useBusinessStore();
+
+  const businessMetrics = businessMode && (
+    <div className="grid grid-cols-1 gap-5 sm:grid-cols-3 mt-6">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h3 className="text-sm font-medium text-gray-500">Total Clients</h3>
+        <p className="text-2xl font-bold">{clients.length}</p>
+      </div>
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h3 className="text-sm font-medium text-gray-500">Active Projects</h3>
+        <p className="text-2xl font-bold">
+          {projects.filter((p) => p.stage !== "done").length}
+        </p>
+      </div>
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow">
+        <h3 className="text-sm font-medium text-gray-500">Revenue Potential</h3>
+        <p className="text-2xl font-bold">
+          ${projects.reduce((sum, p) => sum + p.value, 0).toLocaleString()}
+        </p>
+      </div>
+    </div>
+  );
+
   const content = (
     <div className={spacing}>
       <header>
@@ -59,39 +83,43 @@ export default function Dashboard() {
           ))}
         </div>
       ) : (
-        <section className={`grid grid-cols-1 md:grid-cols-3 ${gap}`}>
-          {stats.map(({ label, value }, index) => {
-            const delay = animationsEnabled ? index * 0.1 : 0;
+        <>
+          <section className={`grid grid-cols-1 md:grid-cols-3 ${gap}`}>
+            {stats.map(({ label, value }, index) => {
+              const delay = animationsEnabled ? index * 0.1 : 0;
 
-            const card = (
-              <div
-                className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${padding}`}
-              >
-                <h3
-                  className={`${cardTitleSize} font-medium text-gray-500 dark:text-gray-400`}
+              const card = (
+                <div
+                  className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${padding}`}
                 >
-                  {label}
-                </h3>
-                <p className={`${cardValueSize} font-bold mt-2 text-brand`}>
-                  {value}
-                </p>
-              </div>
-            );
+                  <h3
+                    className={`${cardTitleSize} font-medium text-gray-500 dark:text-gray-400`}
+                  >
+                    {label}
+                  </h3>
+                  <p className={`${cardValueSize} font-bold mt-2 text-brand`}>
+                    {value}
+                  </p>
+                </div>
+              );
 
-            return animationsEnabled ? (
-              <motion.div
-                key={label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.4, delay, ease: "easeOut" }}
-              >
-                {card}
-              </motion.div>
-            ) : (
-              <div key={label}>{card}</div>
-            );
-          })}
-        </section>
+              return animationsEnabled ? (
+                <motion.div
+                  key={label}
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay, ease: "easeOut" }}
+                >
+                  {card}
+                </motion.div>
+              ) : (
+                <div key={label}>{card}</div>
+              );
+            })}
+          </section>
+
+          {businessMetrics}
+        </>
       )}
     </div>
   );
