@@ -5,7 +5,10 @@ import {
   BarChart2,
   User,
   Settings,
+  Briefcase,
+  Users,
 } from "lucide-react";
+import { useBusinessStore } from "../store/useBusinessStore";
 
 const links = [
   { to: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -21,6 +24,17 @@ type SidebarProps = {
 };
 
 export default function Sidebar({ className = "", onNavigate }: SidebarProps) {
+  const { businessMode } = useBusinessStore();
+
+  const businessLinks = businessMode
+    ? [
+        { to: "/clients", label: "Clients", icon: Users },
+        { to: "/projects", label: "Projects", icon: Briefcase },
+      ]
+    : [];
+
+  const allLinks = [...links, ...businessLinks];
+
   return (
     <aside
       className={`w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-700 flex flex-col p-4 ${className}`}
@@ -33,7 +47,7 @@ export default function Sidebar({ className = "", onNavigate }: SidebarProps) {
       </NavLink>
 
       <nav className="flex flex-col gap-2">
-        {links.map(({ to, label, icon: Icon }) => (
+        {allLinks.map(({ to, label, icon: Icon }) => (
           <NavLink
             key={to}
             to={to}
