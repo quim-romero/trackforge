@@ -15,6 +15,8 @@ const Tasks = lazy(() => import("./pages/Tasks"));
 const Stats = lazy(() => import("./pages/Stats"));
 const Profile = lazy(() => import("./pages/Profile"));
 const Settings = lazy(() => import("./pages/Settings"));
+import Clients from "./pages/Clients";
+import Projects from "./pages/Projects";
 
 export default function App() {
   return (
@@ -27,6 +29,7 @@ export default function App() {
       >
         <Suspense fallback={null}>
           <Routes>
+            {/* Public routes */}
             <Route element={<OnboardingLayout />}>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
@@ -34,6 +37,7 @@ export default function App() {
               <Route path="/auth/callback" element={<AuthCallback />} />
             </Route>
 
+            {/* Protected routes */}
             <Route
               element={
                 <ProtectedRoute>
@@ -46,6 +50,8 @@ export default function App() {
               <Route path="/stats" element={<Stats />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/settings" element={<Settings />} />
+              <Route path="/clients" element={<Clients />} />
+              <Route path="/projects" element={<Projects />} />
             </Route>
           </Routes>
         </Suspense>
