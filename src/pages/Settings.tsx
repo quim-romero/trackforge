@@ -1,9 +1,11 @@
 import { useSettingsStore } from "../store/useSettingsStore";
 import { motion } from "framer-motion";
+import { useBusinessStore } from "../store/useBusinessStore";
 
 export default function Settings() {
   const { density, animations, setDensity, toggleAnimations } =
     useSettingsStore();
+  const { businessMode, toggleBusinessMode } = useBusinessStore();
 
   const padding = density === "compact" ? "p-4" : "p-6";
   const gap = density === "compact" ? "space-y-4" : "space-y-6";
@@ -58,6 +60,27 @@ export default function Settings() {
             onClick={toggleAnimations}
             className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors duration-200 ${
               animations
+                ? "bg-brand justify-end"
+                : "bg-gray-300 dark:bg-gray-600 justify-start"
+            }`}
+          >
+            <span className="w-4 h-4 bg-white rounded-full shadow" />
+          </button>
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              Business Mode
+            </h4>
+            <p className="text-xs text-gray-500 dark:text-gray-400">
+              Enable client & project management
+            </p>
+          </div>
+          <button
+            onClick={toggleBusinessMode}
+            className={`w-12 h-6 rounded-full flex items-center px-1 transition-colors duration-200 ${
+              businessMode
                 ? "bg-brand justify-end"
                 : "bg-gray-300 dark:bg-gray-600 justify-start"
             }`}
