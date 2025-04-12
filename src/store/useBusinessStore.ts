@@ -1,6 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
-import { Client, Project } from "../types/index";
+import type { Client, Project } from '../types'
 
 interface BusinessState {
   clients: Client[];
@@ -13,7 +13,7 @@ interface BusinessState {
 
 export const useBusinessStore = create<BusinessState>()(
   persist(
-    (set, get) => ({
+    (set) => ({
       clients: [],
       projects: [],
       businessMode: false,

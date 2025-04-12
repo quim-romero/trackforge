@@ -24,7 +24,7 @@ export interface Project {
   title: string;
   clientId: string;
   value: number;
-  stage: "todo" | "in-progress" | "review" | "done";
+  stage: "all" | "in-progress" | "review" | "done";
   priority: Priority;
   dueDate: string;
   createdAt: string;
