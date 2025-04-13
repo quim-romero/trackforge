@@ -1,14 +1,28 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import { Menu } from "lucide-react";
 import Sidebar from "./Sidebar";
 import ThemeToggle from "./ThemeToggle";
 import { useAuth } from "../auth/useAuth";
+import { useBusinessStore } from "../store/useBusinessStore";
 
 export default function Layout() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const { logout } = useAuth();
   const navigate = useNavigate();
+
+  const { clients, projects, businessMode, loadDemoData, toggleBusinessMode } =
+    useBusinessStore();
+  const { user } = useAuth();
+  useEffect(() => {
+    const isDemo = user?.id === "demo-user";
+    if (!isDemo) return;
+
+    const hasBusinessData = clients.length > 0 || projects.length > 0;
+    if (!hasBusinessData) loadDemoData();
+    if (!businessMode) toggleBusinessMode();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const handleLogout = async () => {
     await logout();

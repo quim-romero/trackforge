@@ -1,11 +1,26 @@
-import { useSettingsStore } from "../store/useSettingsStore";
+import { useEffect } from "react";
 import { motion } from "framer-motion";
+import { useSettingsStore } from "../store/useSettingsStore";
 import { useBusinessStore } from "../store/useBusinessStore";
+import { useAuth } from "../auth/useAuth";
 
 export default function Settings() {
+  const { user } = useAuth();
   const { density, animations, setDensity, toggleAnimations } =
     useSettingsStore();
-  const { businessMode, toggleBusinessMode } = useBusinessStore();
+
+  const { businessMode, toggleBusinessMode, clients, projects, loadDemoData } =
+    useBusinessStore();
+
+  useEffect(() => {
+    const isDemo = user?.id === "demo-user";
+    if (!isDemo) return;
+
+    const hasBusinessData = clients.length > 0 || projects.length > 0;
+    if (!hasBusinessData) loadDemoData();
+    if (!businessMode) toggleBusinessMode();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const padding = density === "compact" ? "p-4" : "p-6";
   const gap = density === "compact" ? "space-y-4" : "space-y-6";
@@ -23,6 +38,11 @@ export default function Settings() {
         <p className={`${descriptionSize} text-gray-500 dark:text-gray-400`}>
           Customize how TrackForge behaves and feels.
         </p>
+        {user?.id === "demo-user" && (
+          <p className="mt-2 text-xs text-brand">
+            Demo mode: Clients & Projects se precargan automáticamente.
+          </p>
+        )}
       </header>
 
       <section
@@ -37,10 +57,7 @@ export default function Settings() {
             onChange={(e) =>
               setDensity(e.target.value as "comfortable" | "compact")
             }
-            className={`w-full px-4 py-2 rounded-md text-sm transition
-              border border-gray-300 dark:border-gray-600
-              bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100
-              focus:outline-none focus:ring-2 focus:ring-brand`}
+            className="w-full px-4 py-2 rounded-md text-sm transition border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-brand"
           >
             <option value="comfortable">Comfortable – spacious layout</option>
             <option value="compact">Compact – tighter spacing</option>
@@ -92,7 +109,7 @@ export default function Settings() {
     </div>
   );
 
-  return animations ? (
+  return useSettingsStore.getState().animations ? (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
