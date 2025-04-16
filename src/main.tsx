@@ -1,13 +1,16 @@
-import { StrictMode } from "react";
-import { createRoot } from "react-dom/client";
+import React from "react";
+import ReactDOM from "react-dom/client";
+import App from "./App";
 import "./App.css";
-import App from "./App.tsx";
 
-const rawTheme = localStorage.getItem("theme-storage");
-if (rawTheme) {
+const raw = localStorage.getItem("theme-storage");
+const rawSettings = localStorage.getItem("trackforge-settings");
+
+if (raw) {
   try {
-    const parsed = JSON.parse(rawTheme);
+    const parsed = JSON.parse(raw);
     const theme = parsed?.state?.theme;
+
     if (theme === "dark") {
       document.documentElement.classList.add("dark");
     } else {
@@ -18,11 +21,11 @@ if (rawTheme) {
   }
 }
 
-const rawSettings = localStorage.getItem("trackforge-settings");
 if (rawSettings) {
   try {
     const parsed = JSON.parse(rawSettings);
     const animations = parsed?.state?.animations;
+
     if (animations === false) {
       document.documentElement.classList.add("no-anim");
     } else {
@@ -33,8 +36,8 @@ if (rawSettings) {
   }
 }
 
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
+ReactDOM.createRoot(document.getElementById("root")!).render(
+  <React.StrictMode>
     <App />
-  </StrictMode>
+  </React.StrictMode>
 );

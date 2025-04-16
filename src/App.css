@@ -2,10 +2,6 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-  font-family: "Inter", sans-serif;
-}
-
 html.no-anim *,
 html.no-anim *::before,
 html.no-anim *::after {
