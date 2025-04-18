@@ -103,7 +103,7 @@ export default function Login() {
         </div>
 
         <footer className="text-xs text-gray-400 pt-4 italic">
-          Built for makers. Not for tourists.
+          Made for focused work.
         </footer>
       </motion.div>
     </main>
