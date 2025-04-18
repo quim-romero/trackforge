@@ -46,7 +46,7 @@ export default function About() {
               to="/"
               className="inline-block mt-6 text-sm text-brand hover:underline"
             >
-              ← Back to flow
+              ← Back to home
             </Link>
           </div>
         </div>
