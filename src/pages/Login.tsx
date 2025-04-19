@@ -1,15 +1,12 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { supabase } from "../auth/supabaseClient";
-import { useAuth } from "../auth/useAuth";
-import { useNavigate } from "react-router-dom";
+import GuestLoginButton from "../components/GuestLoginButton";
 
 export default function Login() {
-  const { setUser } = useAuth();
   const [email, setEmail] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -23,16 +20,6 @@ export default function Login() {
     } else {
       setMessage("Check your inbox. The magic link is on its way.");
     }
-  };
-
-  const handleDemoLogin = () => {
-    const demoUser = {
-      id: "demo-user",
-      email: "demo@trackforge.app",
-    };
-    localStorage.setItem("demo-user", JSON.stringify(demoUser));
-    setUser(demoUser);
-    navigate("/dashboard");
   };
 
   return (
@@ -95,12 +82,7 @@ export default function Login() {
           </form>
 
           <div className="pt-2">
-            <button
-              onClick={handleDemoLogin}
-              className="w-full text-sm border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-200 px-4 py-2 rounded-md hover:bg-gray-100 dark:hover:bg-gray-800 transition"
-            >
-              👀 Enter as demo
-            </button>
+            <GuestLoginButton />
           </div>
 
           <footer className="text-xs text-gray-400 pt-4 italic text-center">
