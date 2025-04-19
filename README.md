@@ -1,5 +1,7 @@
 # TrackForge — Minimal Task Manager for Makers
 
+![E2E Tests](https://github.com/quim-romero/trackforge/actions/workflows/e2e.yml/badge.svg)
+
 > _No friction. No noise. Just focus, flow — and your next task._
 
 ---
