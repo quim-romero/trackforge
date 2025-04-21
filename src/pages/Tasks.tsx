@@ -6,15 +6,14 @@ import { useSettingsStore } from "../store/useSettingsStore";
 import type { Task } from "../types";
 import { motion } from "framer-motion";
 
+type StatusFilter = "all" | "completed" | "active";
+type PriorityFilter = "all" | "low" | "medium" | "high";
+
 export default function Tasks() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState<Partial<Task> | null>(null);
-  const [statusFilter, setStatusFilter] = useState<
-    "all" | "completed" | "active"
-  >("all");
-  const [priorityFilter, setPriorityFilter] = useState<
-    "all" | "low" | "medium" | "high"
-  >("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
+  const [priorityFilter, setPriorityFilter] = useState<PriorityFilter>("all");
 
   const { tasks, loading, toggleTask, deleteTask } = useTaskStore();
   const density = useSettingsStore((state) => state.density);
@@ -71,7 +70,9 @@ export default function Tasks() {
           </label>
           <select
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as any)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setStatusFilter(e.target.value as StatusFilter)
+            }
             className={`rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 ${filterPadding}`}
           >
             <option value="all">All</option>
@@ -86,7 +87,9 @@ export default function Tasks() {
           </label>
           <select
             value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value as any)}
+            onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+              setPriorityFilter(e.target.value as PriorityFilter)
+            }
             className={`rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 ${filterPadding}`}
           >
             <option value="all">All</option>

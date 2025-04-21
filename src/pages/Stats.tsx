@@ -15,11 +15,11 @@ import { Bar } from "react-chartjs-2";
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
+const DAYS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 export default function Stats() {
   const animationsEnabled = useSettingsStore((state) => state.animations);
   const { tasks, loading } = useTaskStore();
-
-  const days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
   const data = useMemo(() => {
     const counts = new Array(7).fill(0);
@@ -31,7 +31,7 @@ export default function Stats() {
       counts[index]++;
     });
     return {
-      labels: days,
+      labels: [...DAYS],
       datasets: [
         {
           label: "Completed Tasks",

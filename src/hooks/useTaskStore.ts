@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { supabase } from "../auth/supabaseClient";
 import { useAuth } from "../auth/useAuth";
 
@@ -11,6 +11,33 @@ export type Task = {
   createdAt: string;
 };
 
+const DEMO_TASKS: Task[] = [
+  {
+    id: "1",
+    title: "Write landing copy",
+    description: "Keep it short and punchy",
+    priority: "high",
+    completed: false,
+    createdAt: new Date().toISOString(),
+  },
+  {
+    id: "2",
+    title: "Refactor auth hook",
+    priority: "medium",
+    completed: true,
+    createdAt: new Date(Date.now() - 86400000).toISOString(),
+  },
+  {
+    id: "3",
+    title: "Push latest commit",
+    priority: "low",
+    completed: false,
+    createdAt: new Date().toISOString(),
+  },
+];
+
+type UpdatableTask = Omit<Partial<Task>, "createdAt">;
+
 export function useTaskStore() {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -18,32 +45,7 @@ export function useTaskStore() {
 
   const isDemo = user?.id === "demo-user";
 
-  const demoTasks: Task[] = [
-    {
-      id: "1",
-      title: "Write landing copy",
-      description: "Keep it short and punchy",
-      priority: "high",
-      completed: false,
-      createdAt: new Date().toISOString(),
-    },
-    {
-      id: "2",
-      title: "Refactor auth hook",
-      priority: "medium",
-      completed: true,
-      createdAt: new Date(Date.now() - 86400000).toISOString(),
-    },
-    {
-      id: "3",
-      title: "Push latest commit",
-      priority: "low",
-      completed: false,
-      createdAt: new Date().toISOString(),
-    },
-  ];
-
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     setLoading(true);
 
     if (!user) {
@@ -53,7 +55,7 @@ export function useTaskStore() {
     }
 
     if (isDemo) {
-      setTasks(demoTasks);
+      setTasks(DEMO_TASKS);
       setLoading(false);
       return;
     }
@@ -68,7 +70,7 @@ export function useTaskStore() {
       console.error("Error loading tasks:", error);
       setTasks([]);
     } else {
-      const formatted = (data ?? []).map((row) => ({
+      const formatted: Task[] = (data ?? []).map((row: any) => ({
         id: row.id,
         title: row.title,
         description: row.description,
@@ -80,7 +82,7 @@ export function useTaskStore() {
     }
 
     setLoading(false);
-  };
+  }, [user?.id, isDemo]);
 
   const addTask = async (task: Omit<Task, "id" | "createdAt">) => {
     if (!user) return;
@@ -148,7 +150,7 @@ export function useTaskStore() {
     }
   };
 
-  const updateTask = async (id: string, updated: Partial<Task>) => {
+  const updateTask = async (id: string, updated: UpdatableTask) => {
     if (isDemo) {
       setTasks((prev) =>
         prev.map((task) => (task.id === id ? { ...task, ...updated } : task))
@@ -156,12 +158,7 @@ export function useTaskStore() {
       return;
     }
 
-    const { createdAt, ...updatePayload } = updated;
-
-    const { error } = await supabase
-      .from("tasks")
-      .update(updatePayload)
-      .eq("id", id);
+    const { error } = await supabase.from("tasks").update(updated).eq("id", id);
 
     if (error) {
       console.error("Error updating task:", error);
@@ -172,7 +169,7 @@ export function useTaskStore() {
 
   useEffect(() => {
     fetchTasks();
-  }, [user?.id]);
+  }, [fetchTasks]);
 
   return {
     tasks,
