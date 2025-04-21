@@ -9,8 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "cypress run",
-    "test:ui": "cypress open",
-    "e2e": "start-server-and-test dev http://localhost:5173 test"
+    "test:e2e": "cypress run --browser chrome",
+    "test:e2e:open": "cypress open",
+    "e2e": "start-server-and-test dev http://localhost:5173 test:e2e"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -35,7 +36,9 @@
     "@typescript-eslint/parser": "^8.39.0",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.4.21",
+    "axe-core": "^4.10.3",
     "cypress": "^14.5.4",
+    "cypress-axe": "^1.6.0",
     "eslint": "^9.32.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-react-hooks": "^5.2.0",
