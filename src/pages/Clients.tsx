@@ -3,12 +3,25 @@ import { useBusinessStore } from "../store/useBusinessStore";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { Pencil, Trash2, Plus } from "lucide-react";
 import type { Client } from "../types";
+import { motion, AnimatePresence } from "framer-motion";
 
 type FormValues = {
   name: string;
   email: string;
   company: string;
   notes?: string;
+};
+
+const modalBackVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1 },
+  exit: { opacity: 0 },
+};
+
+const modalCardVariants = {
+  hidden: { opacity: 0, y: 16, scale: 0.98 },
+  visible: { opacity: 1, y: 0, scale: 1 },
+  exit: { opacity: 0, y: 8, scale: 0.98 },
 };
 
 function ClientModal({
@@ -23,6 +36,7 @@ function ClientModal({
   onSubmit: (values: FormValues) => void;
 }) {
   const density = useSettingsStore((s) => s.density);
+  const animations = useSettingsStore((s) => s.animations);
   const pad = density === "compact" ? "p-4" : "p-6";
   const inputPad =
     density === "compact" ? "px-3 py-1.5 text-sm" : "px-4 py-2 text-sm";
@@ -44,94 +58,105 @@ function ClientModal({
     onClose();
   };
 
-  if (!open) return null;
-
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center"
-      role="dialog"
-      aria-modal="true"
-      onMouseDown={(e) => e.target === e.currentTarget && onClose()}
-    >
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
-      <form
-        onSubmit={submit}
-        className={`relative mx-4 w-full max-w-lg rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl ${pad} space-y-4`}
-      >
-        <h2 className="text-lg font-semibold">
-          {initial?.id ? "Edit client" : "New client"}
-        </h2>
-
-        <div className="space-y-1">
-          <label className="text-sm text-gray-600 dark:text-gray-300">
-            Name
-          </label>
-          <input
-            className={`w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 ${inputPad}`}
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="Customer name"
-            required
-            autoFocus
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+          onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+        >
+          <motion.div
+            className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+            variants={animations ? modalBackVariants : {}}
+            transition={{ duration: 0.2 }}
           />
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <div className="space-y-1">
-            <label className="text-sm text-gray-600 dark:text-gray-300">
-              Email
-            </label>
-            <input
-              type="email"
-              className={`w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 ${inputPad}`}
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="client@company.com"
-            />
-          </div>
-
-          <div className="space-y-1">
-            <label className="text-sm text-gray-600 dark:text-gray-300">
-              Company
-            </label>
-            <input
-              className={`w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 ${inputPad}`}
-              value={company}
-              onChange={(e) => setCompany(e.target.value)}
-              placeholder="Company"
-            />
-          </div>
-        </div>
-
-        <div className="space-y-1">
-          <label className="text-sm text-gray-600 dark:text-gray-300">
-            Notes
-          </label>
-          <textarea
-            className={`w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 ${inputPad} min-h-[88px] resize-y`}
-            value={notes}
-            onChange={(e) => setNotes(e.target.value)}
-            placeholder="Internal notes…"
-          />
-        </div>
-
-        <div className="flex justify-end gap-2 pt-2">
-          <button
-            type="button"
-            onClick={onClose}
-            className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-sm"
+          <motion.form
+            onSubmit={submit}
+            variants={animations ? modalCardVariants : {}}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className={`relative mx-4 w-full max-w-lg rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl ${pad} space-y-4`}
           >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            className="px-4 py-2 rounded-md bg-brand text-white hover:bg-brand-dark text-sm"
-          >
-            {initial?.id ? "Save" : "Create"}
-          </button>
-        </div>
-      </form>
-    </div>
+            <h2 className="text-lg font-semibold">
+              {initial?.id ? "Edit client" : "New client"}
+            </h2>
+
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600 dark:text-gray-300">
+                Name
+              </label>
+              <input
+                className={`w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 ${inputPad}`}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="Customer name"
+                required
+                autoFocus
+              />
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="space-y-1">
+                <label className="text-sm text-gray-600 dark:text-gray-300">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  className={`w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 ${inputPad}`}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="client@company.com"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-sm text-gray-600 dark:text-gray-300">
+                  Company
+                </label>
+                <input
+                  className={`w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 ${inputPad}`}
+                  value={company}
+                  onChange={(e) => setCompany(e.target.value)}
+                  placeholder="Company"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-sm text-gray-600 dark:text-gray-300">
+                Notes
+              </label>
+              <textarea
+                className={`w-full border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-900 ${inputPad} min-h-[88px] resize-y`}
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Internal notes…"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={onClose}
+                className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-sm"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="px-4 py-2 rounded-md bg-brand text-white hover:bg-brand-dark text-sm"
+              >
+                {initial?.id ? "Save" : "Create"}
+              </button>
+            </div>
+          </motion.form>
+        </motion.div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -172,6 +197,7 @@ export default function Clients() {
     };
 
   const density = useSettingsStore((s) => s.density);
+  const animations = useSettingsStore((s) => s.animations);
   const gridGap = density === "compact" ? "gap-3" : "gap-6";
   const itemPad = density === "compact" ? "p-2.5" : "p-3.5";
   const headerSz = density === "compact" ? "text-xl" : "text-2xl";
@@ -215,7 +241,7 @@ export default function Clients() {
     });
   };
 
-  return (
+  const content = (
     <div className="space-y-6">
       <header className="flex justify-between items-center">
         <div className="flex items-center gap-3">
@@ -233,13 +259,32 @@ export default function Clients() {
       </header>
 
       {clients.length > 0 ? (
-        <section
+        <motion.section
           className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 ${gridGap}`}
+          initial={animations ? "hidden" : false}
+          animate={animations ? "visible" : false}
+          variants={{
+            hidden: { opacity: 0, y: 10 },
+            visible: {
+              opacity: 1,
+              y: 0,
+              transition: { staggerChildren: 0.06, delayChildren: 0.02 },
+            },
+          }}
         >
-          {clients.map((client) => (
-            <article
+          {clients.map((client, i) => (
+            <motion.article
               key={client.id}
+              variants={{
+                hidden: { opacity: 0, y: 10 },
+                visible: {
+                  opacity: 1,
+                  y: 0,
+                  transition: { duration: 0.25, ease: "easeOut" },
+                },
+              }}
               className={`rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 ${itemPad} hover:border-brand/40 transition`}
+              style={{ transitionDelay: animations ? `${i * 0.01}s` : "0s" }}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-2 min-w-0">
@@ -285,9 +330,9 @@ export default function Clients() {
                   {client.notes}
                 </p>
               )}
-            </article>
+            </motion.article>
           ))}
-        </section>
+        </motion.section>
       ) : (
         <p className="text-gray-500 text-center py-8">
           No clients yet. Create your first one!
@@ -301,5 +346,17 @@ export default function Clients() {
         onSubmit={editing ? handleSave : handleCreate}
       />
     </div>
+  );
+
+  return animations ? (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
+      {content}
+    </motion.div>
+  ) : (
+    content
   );
 }

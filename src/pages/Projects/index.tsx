@@ -5,6 +5,7 @@ import ProjectColumn from "../../components/projects/ProjectColumn";
 import ProjectForm from "../../components/projects/ProjectForm";
 import { useProjectDnd } from "../../hooks/useProjectDnd";
 import type { Project } from "../../types";
+import { motion, AnimatePresence } from "framer-motion";
 
 const STAGES: Project["stage"][] = ["all", "in-progress", "review", "done"];
 
@@ -12,6 +13,7 @@ export default function ProjectsPage() {
   const { projects, addProject, updateProject, deleteProject } =
     useBusinessStore();
   const density = useSettingsStore((s) => s.density);
+  const animations = useSettingsStore((s) => s.animations);
   const dnd = useProjectDnd();
 
   const [showForm, setShowForm] = useState(false);
@@ -67,7 +69,7 @@ export default function ProjectsPage() {
   const btnPad =
     density === "compact" ? "px-3 py-1.5 text-sm" : "px-4 py-2 text-sm";
 
-  return (
+  const content = (
     <div className="space-y-6">
       <header className="flex justify-between items-center">
         <h2 className={`${headerSize} font-bold`}>Projects</h2>
@@ -82,35 +84,66 @@ export default function ProjectsPage() {
         </button>
       </header>
 
-      {(showForm || editing) && (
-        <section
-          className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${sectionPad}`}
-        >
-          <ProjectForm
-            initial={editing ?? undefined}
-            onCancel={() => {
-              setShowForm(false);
-              setEditing(null);
-            }}
-            onSubmit={editing ? handleEdit : handleCreate}
-          />
-        </section>
-      )}
+      <AnimatePresence>
+        {(showForm || editing) && (
+          <motion.section
+            key="project-form"
+            initial={animations ? { opacity: 0, y: 10 } : false}
+            animate={animations ? { opacity: 1, y: 0 } : false}
+            exit={animations ? { opacity: 0, y: 8 } : undefined}
+            transition={{ duration: 0.25, ease: "easeOut" }}
+            className={`bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl shadow-sm ${sectionPad}`}
+          >
+            <ProjectForm
+              initial={editing ?? undefined}
+              onCancel={() => {
+                setShowForm(false);
+                setEditing(null);
+              }}
+              onSubmit={editing ? handleEdit : handleCreate}
+            />
+          </motion.section>
+        )}
+      </AnimatePresence>
 
-      <div className={`grid grid-cols-1 md:grid-cols-4 ${gridGap}`}>
-        {STAGES.map((stage) => (
-          <ProjectColumn
+      <motion.div
+        className={`grid grid-cols-1 md:grid-cols-4 ${gridGap}`}
+        initial={animations ? "hidden" : false}
+        animate={animations ? "visible" : false}
+        variants={{
+          hidden: { opacity: 0, y: 10 },
+          visible: {
+            opacity: 1,
+            y: 0,
+            transition: { staggerChildren: 0.08, delayChildren: 0.04 },
+          },
+        }}
+      >
+        {STAGES.map((stage, i) => (
+          <motion.div
             key={stage}
-            title={stage.replace("-", " ")}
-            stage={stage}
-            projects={byStage[stage]}
-            dnd={dnd}
-            onEdit={(p) => setEditing(p)}
-            onDelete={(id) => deleteProject(id)}
-            dense={density === "compact"}
-          />
+            variants={{
+              hidden: { opacity: 0, y: 8 },
+              visible: {
+                opacity: 1,
+                y: 0,
+                transition: { duration: 0.25, ease: "easeOut" },
+              },
+            }}
+            style={{ transitionDelay: animations ? `${i * 0.03}s` : "0s" }}
+          >
+            <ProjectColumn
+              title={stage.replace("-", " ")}
+              stage={stage}
+              projects={byStage[stage]}
+              dnd={dnd}
+              onEdit={(p) => setEditing(p)}
+              onDelete={(id) => deleteProject(id)}
+              dense={density === "compact"}
+            />
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
       {projects.length === 0 && (
         <p className="text-gray-500 text-center py-8">
@@ -118,5 +151,17 @@ export default function ProjectsPage() {
         </p>
       )}
     </div>
+  );
+
+  return animations ? (
+    <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, ease: "easeOut" }}
+    >
+      {content}
+    </motion.div>
+  ) : (
+    content
   );
 }
