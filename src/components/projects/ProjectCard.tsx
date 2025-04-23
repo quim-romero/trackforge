@@ -20,6 +20,7 @@ export default function ProjectCard({
   onDelete,
 }: Props) {
   const [open, setOpen] = useState(false);
+
   return (
     <div
       className="group relative rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 p-3 hover:border-brand/40 transition"
@@ -43,19 +44,25 @@ export default function ProjectCard({
         <button
           onClick={() => setOpen((o) => !o)}
           className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+          aria-haspopup="menu"
+          aria-expanded={open}
         >
           <MoreHorizontal className="w-4 h-4" />
         </button>
       </div>
 
       {open && (
-        <div className="absolute right-2 top-8 z-10 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-md">
+        <div
+          className="absolute right-2 top-8 z-50 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-md shadow-lg"
+          role="menu"
+        >
           <button
             onClick={() => {
               setOpen(false);
               onEdit();
             }}
             className="flex items-center gap-2 px-3 py-2 text-sm hover:bg-gray-50 dark:hover:bg-gray-700 w-full"
+            role="menuitem"
           >
             <Pencil className="w-4 h-4" /> Edit
           </button>
@@ -65,6 +72,7 @@ export default function ProjectCard({
               onDelete();
             }}
             className="flex items-center gap-2 px-3 py-2 text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 w-full"
+            role="menuitem"
           >
             <Trash2 className="w-4 h-4" /> Delete
           </button>

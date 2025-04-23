@@ -27,9 +27,9 @@ export default function ProjectColumn({
     dnd.columnDropProps(stage).onDrop(e, index);
 
   return (
-    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+    <div className="relative rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm">
       <div
-        className={`${pad} border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30`}
+        className={`${pad} border-b border-gray-100 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/30 rounded-t-xl`}
       >
         <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-200 capitalize flex items-center gap-2">
           <span className="inline-block w-1.5 h-4 rounded-full bg-brand" />
