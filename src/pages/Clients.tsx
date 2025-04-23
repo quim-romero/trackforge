@@ -259,32 +259,13 @@ export default function Clients() {
       </header>
 
       {clients.length > 0 ? (
-        <motion.section
+        <section
           className={`grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 ${gridGap}`}
-          initial={animations ? "hidden" : false}
-          animate={animations ? "visible" : false}
-          variants={{
-            hidden: { opacity: 0, y: 10 },
-            visible: {
-              opacity: 1,
-              y: 0,
-              transition: { staggerChildren: 0.06, delayChildren: 0.02 },
-            },
-          }}
         >
-          {clients.map((client, i) => (
-            <motion.article
+          {clients.map((client) => (
+            <article
               key={client.id}
-              variants={{
-                hidden: { opacity: 0, y: 10 },
-                visible: {
-                  opacity: 1,
-                  y: 0,
-                  transition: { duration: 0.25, ease: "easeOut" },
-                },
-              }}
               className={`rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900/60 ${itemPad} hover:border-brand/40 transition`}
-              style={{ transitionDelay: animations ? `${i * 0.01}s` : "0s" }}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-2 min-w-0">
@@ -330,9 +311,9 @@ export default function Clients() {
                   {client.notes}
                 </p>
               )}
-            </motion.article>
+            </article>
           ))}
-        </motion.section>
+        </section>
       ) : (
         <p className="text-gray-500 text-center py-8">
           No clients yet. Create your first one!
@@ -352,7 +333,7 @@ export default function Clients() {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
     >
       {content}
     </motion.div>

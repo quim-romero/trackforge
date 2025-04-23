@@ -106,44 +106,21 @@ export default function ProjectsPage() {
         )}
       </AnimatePresence>
 
-      <motion.div
-        className={`grid grid-cols-1 md:grid-cols-4 ${gridGap}`}
-        initial={animations ? "hidden" : false}
-        animate={animations ? "visible" : false}
-        variants={{
-          hidden: { opacity: 0, y: 10 },
-          visible: {
-            opacity: 1,
-            y: 0,
-            transition: { staggerChildren: 0.08, delayChildren: 0.04 },
-          },
-        }}
-      >
-        {STAGES.map((stage, i) => (
-          <motion.div
+      {/* Lista sin animar por columnas/cajuelas */}
+      <div className={`grid grid-cols-1 md:grid-cols-4 ${gridGap}`}>
+        {STAGES.map((stage) => (
+          <ProjectColumn
             key={stage}
-            variants={{
-              hidden: { opacity: 0, y: 8 },
-              visible: {
-                opacity: 1,
-                y: 0,
-                transition: { duration: 0.25, ease: "easeOut" },
-              },
-            }}
-            style={{ transitionDelay: animations ? `${i * 0.03}s` : "0s" }}
-          >
-            <ProjectColumn
-              title={stage.replace("-", " ")}
-              stage={stage}
-              projects={byStage[stage]}
-              dnd={dnd}
-              onEdit={(p) => setEditing(p)}
-              onDelete={(id) => deleteProject(id)}
-              dense={density === "compact"}
-            />
-          </motion.div>
+            title={stage.replace("-", " ")}
+            stage={stage}
+            projects={byStage[stage]}
+            dnd={dnd}
+            onEdit={(p) => setEditing(p)}
+            onDelete={(id) => deleteProject(id)}
+            dense={density === "compact"}
+          />
         ))}
-      </motion.div>
+      </div>
 
       {projects.length === 0 && (
         <p className="text-gray-500 text-center py-8">
@@ -157,7 +134,7 @@ export default function ProjectsPage() {
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, ease: "easeOut" }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
     >
       {content}
     </motion.div>
