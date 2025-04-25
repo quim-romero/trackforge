@@ -1,13 +1,27 @@
-import { useAuth } from "../auth/useAuth";
-export default function GuestLoginButton() {
-  const { setUser } = useAuth();
+import { useNavigate } from "react-router-dom";
+import { useAuthStore } from "../store/useAuthStore";
+
+export default function GuestLoginButton({
+  className = "",
+}: {
+  className?: string;
+}) {
+  const navigate = useNavigate();
+  const setUser = useAuthStore((s) => s.setUser);
+
   const loginAsGuest = () => {
-    const guest = { id: "guest", email: "guest@demo.local", name: "Guest" };
+    const guest = { id: "demo-user", email: "guest@demo.local", name: "Guest" };
     localStorage.setItem("demo-user", JSON.stringify(guest));
     setUser(guest);
+    navigate("/tasks");
   };
+
   return (
-    <button onClick={loginAsGuest} className="btn btn-ghost w-full">
+    <button
+      data-cy="guest-login"
+      onClick={loginAsGuest}
+      className={`btn btn-ghost w-full ${className}`}
+    >
       Enter as a guest
     </button>
   );

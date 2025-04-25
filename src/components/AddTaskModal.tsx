@@ -1,142 +1,167 @@
-import { X } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { useTaskStore } from "../hooks/useTaskStore";
+import { useSearchParams } from "react-router-dom";
 
-const schema = z.object({
-  title: z.string().min(1, "Title is required"),
-  description: z.string().optional(),
-  priority: z.enum(["low", "medium", "high"]),
-});
-
-type FormData = z.infer<typeof schema>;
+type FormValues = {
+  title: string;
+  description?: string;
+};
 
 type AddTaskModalProps = {
-  isOpen: boolean;
+  open: boolean;
   onClose: () => void;
-  defaultValues?: FormData & { id?: string };
+  onSubmit?: (values: FormValues) => Promise<void> | void;
+  defaultValues?: Partial<FormValues>;
 };
 
 export default function AddTaskModal({
-  isOpen,
+  open,
   onClose,
+  onSubmit,
   defaultValues,
 }: AddTaskModalProps) {
-  const isEditMode = !!defaultValues?.id;
-  const { addTask, updateTask } = useTaskStore();
-  const [submitting, setSubmitting] = useState(false);
+  const isEditMode = !!(defaultValues && defaultValues.title);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const qsOpen = searchParams.get("new") === "1";
+  const effectiveOpen = open || qsOpen;
 
   const {
     register,
     handleSubmit,
     reset,
-    formState: { errors },
-  } = useForm<FormData>({
-    resolver: zodResolver(schema),
-    defaultValues: defaultValues || {
-      title: "",
-      description: "",
-      priority: "medium",
+    formState: { errors, isSubmitting },
+    setFocus,
+  } = useForm<FormValues>({
+    defaultValues: {
+      title: defaultValues?.title ?? "",
+      description: defaultValues?.description ?? "",
     },
   });
 
-  useEffect(() => {
-    if (isOpen) {
-      reset(
-        defaultValues || {
-          title: "",
-          description: "",
-          priority: "medium",
-        }
-      );
-    }
-  }, [isOpen, defaultValues, reset]);
+  const [submitting, setSubmitting] = useState(false);
 
-  const onSubmit = async (data: FormData) => {
-    setSubmitting(true);
-    if (isEditMode && defaultValues?.id) {
-      await updateTask(defaultValues.id, data);
-    } else {
-      await addTask({ ...data, completed: false });
+  const closeAll = useCallback(() => {
+    onClose?.();
+    if (qsOpen) {
+      const next = new URLSearchParams(searchParams);
+      next.delete("new");
+      setSearchParams(next, { replace: true });
     }
-    setSubmitting(false);
-    onClose();
+  }, [onClose, qsOpen, searchParams, setSearchParams]);
+
+  useEffect(() => {
+    if (effectiveOpen) {
+      reset({
+        title: defaultValues?.title ?? "",
+        description: defaultValues?.description ?? "",
+      });
+      setTimeout(() => setFocus("title"), 0);
+    }
+  }, [effectiveOpen, defaultValues, reset, setFocus]);
+
+  useEffect(() => {
+    if (!effectiveOpen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeAll();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [effectiveOpen, closeAll]);
+
+  const submit = async (values: FormValues) => {
+    try {
+      setSubmitting(true);
+      if (onSubmit) await onSubmit(values);
+      closeAll();
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (!isOpen) return null;
+  if (!effectiveOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/40 z-40 flex items-center justify-center">
-      <div className="bg-white dark:bg-gray-900 rounded-xl p-6 w-full max-w-md shadow-xl relative z-50 border border-gray-200 dark:border-gray-700">
-        <button
-          onClick={() => {
-            onClose();
-            reset();
-          }}
-          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
-          aria-label="Close"
+    <div
+      data-cy="add-task-modal"
+      className="fixed inset-0 z-50 flex items-center justify-center"
+      aria-modal="true"
+      role="dialog"
+      aria-labelledby="add-task-title"
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget) closeAll();
+      }}
+    >
+      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" />
+      <div className="relative mx-4 w-full max-w-lg rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-xl">
+        <div className="px-6 py-5 border-b border-gray-200 dark:border-gray-700">
+          <h2
+            id="add-task-title"
+            className="text-lg font-semibold text-gray-900 dark:text-gray-100"
+          >
+            {isEditMode ? "Edit Task" : "New Task"}
+          </h2>
+        </div>
+
+        <form
+          onSubmit={handleSubmit(submit)}
+          className="px-6 py-5 space-y-4"
+          noValidate
         >
-          <X className="w-5 h-5" />
-        </button>
-
-        <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-gray-100">
-          {isEditMode ? "Edit Task" : "New Task"}
-        </h3>
-
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
+          <div className="space-y-1">
+            <label
+              htmlFor="task-title"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
               Title
             </label>
             <input
+              id="task-title"
               type="text"
-              {...register("title")}
+              {...register("title", { required: "Title is required" })}
+              data-cy="task-title"
               className="w-full rounded-md px-3 py-2 text-sm border bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand"
               placeholder="Task title"
-              disabled={submitting}
+              disabled={submitting || isSubmitting}
+              autoComplete="off"
             />
             {errors.title && (
-              <p className="text-sm text-red-500 mt-1">
-                {errors.title.message}
-              </p>
+              <p className="text-xs text-red-600">{errors.title.message}</p>
             )}
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Description
+          <div className="space-y-1">
+            <label
+              htmlFor="task-description"
+              className="block text-sm font-medium text-gray-700 dark:text-gray-300"
+            >
+              Description <span className="opacity-60">(optional)</span>
             </label>
             <textarea
+              id="task-description"
               {...register("description")}
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              disabled={submitting}
+              className="w-full h-28 rounded-md px-3 py-2 text-sm border bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand resize-y"
+              placeholder="Add a few details…"
+              disabled={submitting || isSubmitting}
             />
           </div>
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-              Priority
-            </label>
-            <select
-              {...register("priority")}
-              className="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-              disabled={submitting}
+          <div className="flex items-center justify-end gap-3 pt-2">
+            <button
+              type="button"
+              onClick={closeAll}
+              className="px-4 py-2 rounded-md border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-800 transition"
+              disabled={submitting || isSubmitting}
             >
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-          </div>
-
-          <div className="pt-2">
+              Cancel
+            </button>
             <button
               type="submit"
-              disabled={submitting}
-              className="w-full bg-brand text-white px-4 py-2 rounded-md hover:bg-brand-dark transition"
+              data-cy="create-task"
+              disabled={submitting || isSubmitting}
+              className="w-36 bg-brand text-white px-4 py-2 rounded-md hover:bg-brand-dark disabled:opacity-60 transition"
             >
-              {submitting
+              {submitting || isSubmitting
                 ? isEditMode
                   ? "Saving..."
                   : "Creating..."

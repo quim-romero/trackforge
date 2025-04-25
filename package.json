@@ -8,10 +8,10 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "cypress run",
-    "test:e2e": "cypress run --browser chrome",
+    "cy:run": "cypress run --browser chrome --headless",
+    "test:e2e": "start-server-and-test dev http://localhost:5173 cy:run",
     "test:e2e:open": "cypress open",
-    "e2e": "start-server-and-test dev http://localhost:5173 test:e2e"
+    "e2e": "npm run test:e2e"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",

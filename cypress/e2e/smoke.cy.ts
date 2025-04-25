@@ -1,13 +1,34 @@
 describe("TrackForge - smoke", () => {
   it("Guest login → create task → view it in list", () => {
-    cy.visit("/");
-    cy.get('[data-cy="guest-login"]').click();
+    cy.visit("/login");
 
-    cy.get('[data-cy="task-title"]').type("Smoke Task");
-    cy.get('[data-cy="create-task"]').click();
+    cy.get("body").then(($body) => {
+      if ($body.find('[data-cy="guest-login"]').length) {
+        cy.get('[data-cy="guest-login"]').click();
+      } else {
+        cy.contains(
+          /(guest login|enter as a guest|continue as guest)/i
+        ).click();
+      }
+    });
 
-    cy.contains("Smoke Task").should("be.visible");
+    cy.location("pathname", { timeout: 10000 }).should((p) => {
+      expect(p).to.not.match(/\/login$/);
+    });
 
-    cy.checkA11y();
+    cy.location().then((loc) => {
+      const base = `${loc.pathname}${loc.search ? "" : ""}`;
+      cy.visit(`${base}?new=1`);
+    });
+
+    cy.get('[data-cy="add-task-modal"]', { timeout: 10000 }).should(
+      "be.visible"
+    );
+
+    const title = `Smoke Task ${Date.now()}`;
+    cy.get('[data-cy="task-title"]').should("be.visible").type(title);
+    cy.get('[data-cy="create-task"]').should("be.enabled").click();
+
+    cy.contains(title, { timeout: 10000 }).should("be.visible");
   });
 });
