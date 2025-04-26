@@ -37,7 +37,9 @@ function createMock(): SupabaseLike {
       onAuthStateChange: (callback) => {
         try {
           callback("INITIAL", null);
-        } catch {}
+        } catch {
+          void 0;
+        }
         return {
           data: {
             subscription: {
