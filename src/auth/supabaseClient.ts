@@ -3,36 +3,87 @@ import { createClient } from "@supabase/supabase-js";
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
-const isCypress =
-  typeof window !== "undefined" &&
-  typeof (window as any).Cypress !== "undefined";
+const isCypress = typeof window !== "undefined" && "Cypress" in window;
 
-function createMock() {
-  const ok = Promise.resolve({ data: null, error: null });
+type Ok = Promise<{ data: unknown; error: null }>;
+type AuthSub = {
+  data: { subscription: { unsubscribe: () => void } };
+  error: null;
+};
+
+export interface SupabaseLike {
+  auth: {
+    getSession: () => Promise<{ data: { session: null }; error: null }>;
+    onAuthStateChange: (
+      callback: (event: string, session: unknown) => void
+    ) => AuthSub;
+    signInWithOAuth: (params: unknown) => Ok;
+    signOut: () => Ok;
+  };
+  from: (table: string) => {
+    select: (query?: string) => Ok;
+    insert: (rows: unknown) => Ok;
+    update: (patch: unknown) => Ok;
+    delete: () => Ok;
+  };
+  rpc: (fn: string, args?: Record<string, unknown>) => Ok;
+}
+
+function createMock(): SupabaseLike {
+  const ok: Ok = Promise.resolve({ data: null, error: null });
   return {
     auth: {
-      getSession: () =>
-        Promise.resolve({ data: { session: null }, error: null }),
-      onAuthStateChange: (_cb: any) => ({
-        data: { subscription: { unsubscribe() {} } },
-        error: null,
-      }),
-      signInWithOAuth: () => ok,
+      getSession: async () => ({ data: { session: null }, error: null }),
+      onAuthStateChange: (callback) => {
+        try {
+          callback("INITIAL", null);
+        } catch {}
+        return {
+          data: {
+            subscription: {
+              unsubscribe() {},
+            },
+          },
+          error: null,
+        };
+      },
+      signInWithOAuth: (params) => {
+        void params;
+        return ok;
+      },
       signOut: () => ok,
     },
-    from: (_table: string) => ({
-      select: () => ok,
-      insert: () => ok,
-      update: () => ok,
-      delete: () => ok,
-    }),
-    rpc: () => ok,
+    from: (table: string) => {
+      void table;
+      return {
+        select: (query?: string) => {
+          void query;
+          return ok;
+        },
+        insert: (rows: unknown) => {
+          void rows;
+          return ok;
+        },
+        update: (patch: unknown) => {
+          void patch;
+          return ok;
+        },
+        delete: () => ok,
+      };
+    },
+    rpc: (fn: string, args?: Record<string, unknown>) => {
+      void fn;
+      void args;
+      return ok;
+    },
   };
 }
 
 const useReal = !!url && !!anon && !isCypress;
 
-export const supabase = useReal ? createClient(url!, anon!) : createMock();
+export const supabase: SupabaseLike = useReal
+  ? (createClient(url!, anon!) as unknown as SupabaseLike)
+  : createMock();
 
 if (!useReal && !isCypress) {
   console.warn(
