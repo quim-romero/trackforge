@@ -1,21 +1,35 @@
 name: CI
+
 on:
-  push: { branches: [main] }
+  push:
+    branches: [main]
   pull_request:
+
 jobs:
   web:
     runs-on: ubuntu-latest
+    env:
+      VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+      VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: "npm"
+          cache: npm
+
       - run: npm ci
-      - run: npm run build
+
+      - run: npm run lint --if-present
+      - run: npm run build --if-present
+
       - name: E2E (Cypress)
         uses: cypress-io/github-action@v6
         with:
           start: npm run dev
-          wait-on: "http://localhost:5173"
+          wait-on: http://localhost:5173
+          wait-on-timeout: 120
           browser: chrome
+          headless: true
