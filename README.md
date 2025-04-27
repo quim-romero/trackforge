@@ -1,6 +1,6 @@
 # TrackForge — Minimal Task Manager for Makers
 
-![E2E Tests](https://github.com/quim-romero/trackforge/actions/workflows/e2e.yml/badge.svg)
+![E2E Tests](https://github.com/quim-romero/trackforge/actions/workflows/ci.yml/badge.svg)
 
 > _No friction. No noise. Just focus, flow — and your next task._
 
@@ -11,6 +11,7 @@
 **TrackForge** isn’t just another task manager — it’s a **focused productivity environment** designed for makers who move with intent.
 
 Built from scratch to be minimal, fast, and deeply intentional, it offers:
+
 - ✍️ Task management with filters, priorities, and inline editing
 - 🎯 UI settings for density, theme, and motion preferences — persisted locally
 - 🔐 Passwordless login via magic link (Supabase Auth)
@@ -40,18 +41,18 @@ Built from scratch to be minimal, fast, and deeply intentional, it offers:
 
 ## 🧠 Tech Stack
 
-| Tech                     | Role                              |
-|--------------------------|-----------------------------------|
-| **React + TypeScript**   | Core frontend framework           |
-| **Zustand**              | Global state management           |
-| **Supabase**             | Auth + database backend           |
-| **Framer Motion**        | Animations and layout transitions |
-| **Tailwind CSS**         | Design system and theming         |
-| **React Hook Form + Zod**| Forms and validation              |
-| **Chart.js**             | Task completion statistics        |
-| **Vite**                 | Build tool and dev server         |
-| **Cypress**              | E2E testing                       |
-| **GitHub Actions**       | Continuous integration            |
+| Tech                      | Role                              |
+| ------------------------- | --------------------------------- |
+| **React + TypeScript**    | Core frontend framework           |
+| **Zustand**               | Global state management           |
+| **Supabase**              | Auth + database backend           |
+| **Framer Motion**         | Animations and layout transitions |
+| **Tailwind CSS**          | Design system and theming         |
+| **React Hook Form + Zod** | Forms and validation              |
+| **Chart.js**              | Task completion statistics        |
+| **Vite**                  | Build tool and dev server         |
+| **Cypress**               | E2E testing                       |
+| **GitHub Actions**        | Continuous integration            |
 
 ---
 
@@ -73,24 +74,31 @@ Built from scratch to be minimal, fast, and deeply intentional, it offers:
 
 ## 🧪 End-to-End Testing
 
-TrackForge includes local **end-to-end tests** powered by [Cypress](https://www.cypress.io/).  
-Core flows like task management, UI preferences, and authentication are covered and verified.
+TrackForge uses **Cypress** for reliable E2E testing, with each PR and every push to `main` triggering checks via **GitHub Actions**.
 
 Currently tested:
-- ✅ Home page headline rendering
+
+- ✅ Home page headline renders
 - ✅ Task creation, completion, filtering, editing, deletion
 - ✅ UI settings: theme toggle, animation toggle, layout density
 
-> 🧰 Tests run locally via `npm run test` or `npm run test:ui`.
+Coming soon:
 
-**Note:** CI integration (e.g. GitHub Actions) is planned and will be added soon.
+- 🖱️ Modal interactions and task quick actions
+- 🧭 Filtering by status and priority (edge cases)
+- ⚙️ Theme, animations, and density persistence across sessions
+- 🔐 Passwordless login (Supabase magic link) end-to-end
+- 📊 Weekly stats chart updates after completing tasks
+- ♿️ Accessibility audits
+
+🧪 [View CI status →](https://github.com/quim-romero/trackforge/actions)
 
 ---
 
 ## 📸 Screenshots
 
-| Home | Dashboard | Tasks |
-|------|-----------|--------|
+| Home                            | Dashboard                                 | Tasks                             |
+| ------------------------------- | ----------------------------------------- | --------------------------------- |
 | ![Home](./screenshots/home.png) | ![Dashboard](./screenshots/dashboard.png) | ![Tasks](./screenshots/tasks.png) |
 
 ---
@@ -108,7 +116,7 @@ Currently tested:
 
 If you're looking for a frontend developer who builds **clean, purposeful, performant** interfaces:
 
-- 📧 quim@quimromero.com  
+- 📧 quim@quimromero.com
 - 🌐 [https://quimromero.com](https://quimromero.com)
 
 ---
