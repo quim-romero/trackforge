@@ -87,11 +87,18 @@ function createChain<T = unknown>(): QueryChain<T> {
     single() {
       return Promise.resolve(ok);
     },
-    then(
-      onfulfilled?: (value: OkResult<T>) => any,
-      onrejected?: (reason: any) => any
-    ) {
-      return Promise.resolve(ok).then(onfulfilled, onrejected);
+    then<TResult1 = OkResult<T>, TResult2 = never>(
+      onfulfilled?:
+        | ((value: OkResult<T>) => TResult1 | PromiseLike<TResult1>)
+        | null,
+      onrejected?:
+        | ((reason: unknown) => TResult2 | PromiseLike<TResult2>)
+        | null
+    ): PromiseLike<TResult1 | TResult2> {
+      return Promise.resolve(ok).then(
+        onfulfilled === null ? undefined : onfulfilled,
+        onrejected === null ? undefined : onrejected
+      );
     },
   } as QueryChain<T>;
 
