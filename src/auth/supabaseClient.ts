@@ -5,25 +5,27 @@ const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
 const isCypress = typeof window !== "undefined" && "Cypress" in window;
 
-type OkResult<T = unknown> = { data: T | null; error: null };
-type OkPromise<T = unknown> = Promise<OkResult<T>>;
+type ApiError = { message: string };
+
+type OkResult<T> = { data: T | null; error: ApiError | null };
+type OkPromise<T> = Promise<OkResult<T>>;
 type AuthSub = {
   data: { subscription: { unsubscribe: () => void } };
   error: null;
 };
 
-interface QueryChain<T = unknown> extends PromiseLike<OkResult<T>> {
-  select: (query?: string) => QueryChain<T>;
-  insert: (rows: unknown) => QueryChain<T>;
-  update: (patch: unknown) => QueryChain<T>;
-  upsert: (rows: unknown) => QueryChain<T>;
-  delete: () => QueryChain<T>;
-  eq: (column: string, value: unknown) => QueryChain<T>;
+interface QueryListChain<T = unknown> extends PromiseLike<OkResult<T[]>> {
+  select: (query?: string) => QueryListChain<T>;
+  insert: (rows: unknown) => QueryListChain<T>;
+  update: (patch: unknown) => QueryListChain<T>;
+  upsert: (rows: unknown) => QueryListChain<T>;
+  delete: () => QueryListChain<T>;
+  eq: (column: string, value: unknown) => QueryListChain<T>;
   order: (
     column: string,
     opts?: { ascending?: boolean; nullsFirst?: boolean }
-  ) => QueryChain<T>;
-  limit: (n: number) => QueryChain<T>;
+  ) => QueryListChain<T>;
+  limit: (n: number) => QueryListChain<T>;
   single: () => PromiseLike<OkResult<T>>;
 }
 
@@ -33,19 +35,23 @@ export interface SupabaseLike {
     onAuthStateChange: (
       callback: (event: string, session: unknown) => void
     ) => AuthSub;
-    signInWithOAuth: (params: unknown) => OkPromise;
+    signInWithOAuth: (params: unknown) => OkPromise<unknown>;
     signInWithOtp: (params: {
       email: string;
       options?: Record<string, unknown>;
-    }) => OkPromise;
-    signOut: () => OkPromise;
+    }) => OkPromise<unknown>;
+    signOut: () => OkPromise<unknown>;
   };
-  from: (table: string) => QueryChain;
-  rpc: (fn: string, args?: Record<string, unknown>) => OkPromise;
+  from: <T = unknown>(table: string) => QueryListChain<T>;
+  rpc: <T = unknown>(
+    fn: string,
+    args?: Record<string, unknown>
+  ) => OkPromise<T>;
 }
 
-function createChain<T = unknown>(): QueryChain<T> {
-  const ok: OkResult<T> = { data: null, error: null };
+function createListChain<T = unknown>(): QueryListChain<T> {
+  const okList: OkResult<T[]> = { data: null, error: null };
+  const okSingle: OkResult<T> = { data: null, error: null };
 
   const chain = {
     select(_query?: string) {
@@ -85,28 +91,41 @@ function createChain<T = unknown>(): QueryChain<T> {
       return chain;
     },
     single() {
-      return Promise.resolve(ok);
+      return {
+        then<TResult1 = OkResult<T>, TResult2 = never>(
+          onfulfilled?:
+            | ((value: OkResult<T>) => TResult1 | PromiseLike<TResult1>)
+            | null,
+          onrejected?:
+            | ((reason: unknown) => TResult2 | PromiseLike<TResult2>)
+            | null
+        ): PromiseLike<TResult1 | TResult2> {
+          return Promise.resolve(okSingle).then(
+            onfulfilled === null ? undefined : onfulfilled,
+            onrejected === null ? undefined : onrejected
+          );
+        },
+      };
     },
-    then<TResult1 = OkResult<T>, TResult2 = never>(
+    then<TResult1 = OkResult<T[]>, TResult2 = never>(
       onfulfilled?:
-        | ((value: OkResult<T>) => TResult1 | PromiseLike<TResult1>)
+        | ((value: OkResult<T[]>) => TResult1 | PromiseLike<TResult1>)
         | null,
       onrejected?:
         | ((reason: unknown) => TResult2 | PromiseLike<TResult2>)
         | null
     ): PromiseLike<TResult1 | TResult2> {
-      return Promise.resolve(ok).then(
+      return Promise.resolve(okList).then(
         onfulfilled === null ? undefined : onfulfilled,
         onrejected === null ? undefined : onrejected
       );
     },
-  } as QueryChain<T>;
+  } as QueryListChain<T>;
 
   return chain;
 }
 
 function createMock(): SupabaseLike {
-  const ok: OkPromise = Promise.resolve({ data: null, error: null });
   return {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
@@ -127,22 +146,22 @@ function createMock(): SupabaseLike {
       },
       signInWithOAuth: (_params) => {
         void _params;
-        return ok;
+        return Promise.resolve({ data: null, error: null });
       },
       signInWithOtp: (_params) => {
         void _params;
-        return ok;
+        return Promise.resolve({ data: null, error: null });
       },
-      signOut: () => ok,
+      signOut: () => Promise.resolve({ data: null, error: null }),
     },
-    from: (_table: string) => {
+    from: <T = unknown>(_table: string) => {
       void _table;
-      return createChain();
+      return createListChain<T>();
     },
-    rpc: (_fn: string, _args?: Record<string, unknown>) => {
+    rpc: <T = unknown>(_fn: string, _args?: Record<string, unknown>) => {
       void _fn;
       void _args;
-      return ok;
+      return Promise.resolve({ data: null as T | null, error: null });
     },
   };
 }

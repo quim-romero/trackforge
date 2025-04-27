@@ -73,7 +73,7 @@ export function useTaskStore() {
       }
 
       const { data, error } = await supabase
-        .from("tasks")
+        .from<TaskRow>("tasks")
         .select("*")
         .eq("user_id", user.id)
         .order("created_at", { ascending: false });
@@ -84,16 +84,14 @@ export function useTaskStore() {
         return;
       }
 
-      const formatted: Task[] = ((data as TaskRow[] | null) ?? []).map(
-        (row) => ({
-          id: row.id,
-          title: row.title,
-          description: row.description ?? undefined,
-          priority: row.priority,
-          completed: row.completed,
-          createdAt: row.created_at,
-        })
-      );
+      const formatted: Task[] = (data ?? []).map((row) => ({
+        id: row.id,
+        title: row.title,
+        description: row.description ?? undefined,
+        priority: row.priority,
+        completed: row.completed,
+        createdAt: row.created_at,
+      }));
 
       if (alive) setTasks(formatted);
     } finally {
@@ -130,7 +128,7 @@ export function useTaskStore() {
     };
 
     const { data, error } = await supabase
-      .from("tasks")
+      .from<TaskRow>("tasks")
       .insert(insertPayload)
       .select()
       .single();
@@ -167,7 +165,7 @@ export function useTaskStore() {
     if (!task) return;
 
     const { error } = await supabase
-      .from("tasks")
+      .from<TaskRow>("tasks")
       .update({ completed: !task.completed })
       .eq("id", id);
 
@@ -189,7 +187,10 @@ export function useTaskStore() {
       return;
     }
 
-    const { error } = await supabase.from("tasks").delete().eq("id", id);
+    const { error } = await supabase
+      .from<TaskRow>("tasks")
+      .delete()
+      .eq("id", id);
     if (error) {
       console.error("Error deleting task:", error);
       return;
@@ -219,7 +220,10 @@ export function useTaskStore() {
 
     if (Object.keys(patch).length === 0) return;
 
-    const { error } = await supabase.from("tasks").update(patch).eq("id", id);
+    const { error } = await supabase
+      .from<TaskRow>("tasks")
+      .update(patch)
+      .eq("id", id);
 
     if (error) {
       console.error("Error updating task:", error);
