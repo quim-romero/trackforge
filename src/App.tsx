@@ -11,6 +11,7 @@ import Settings from "./pages/Settings";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import About from "./pages/About";
+import AuthCallback from "./pages/AuthCallback";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
 
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/about" element={<About />} />
+          <Route path="/auth/callback" element={<AuthCallback />} />
         </Route>
 
         <Route

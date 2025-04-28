@@ -1,4 +1,8 @@
-import { createClient } from "@supabase/supabase-js";
+import {
+  createClient,
+  type Session,
+  type AuthChangeEvent,
+} from "@supabase/supabase-js";
 
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const anon = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
@@ -29,17 +33,32 @@ interface QueryListChain<T = unknown> extends PromiseLike<OkResult<T[]>> {
   single: () => PromiseLike<OkResult<T>>;
 }
 
+export type VerifyOtpParamsLite = {
+  type: "magiclink" | "recovery" | "invite" | "email_change";
+  token_hash?: string;
+  email?: string;
+  phone?: string;
+  token?: string;
+  captchaToken?: string;
+};
+
 export interface SupabaseLike {
   auth: {
-    getSession: () => Promise<{ data: { session: null }; error: null }>;
+    getSession: () => Promise<{
+      data: { session: Session | null };
+      error: null;
+    }>;
     onAuthStateChange: (
-      callback: (event: string, session: unknown) => void
+      callback: (event: AuthChangeEvent, session: Session | null) => void
     ) => AuthSub;
     signInWithOAuth: (params: unknown) => OkPromise<unknown>;
     signInWithOtp: (params: {
       email: string;
       options?: Record<string, unknown>;
     }) => OkPromise<unknown>;
+    verifyOtp: (
+      params: VerifyOtpParamsLite
+    ) => OkPromise<{ session: Session | null }>;
     signOut: () => OkPromise<unknown>;
   };
   from: <T = unknown>(table: string) => QueryListChain<T>;
@@ -129,12 +148,8 @@ function createMock(): SupabaseLike {
   return {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
-      onAuthStateChange: (callback) => {
-        try {
-          callback("INITIAL", null);
-        } catch {
-          void 0;
-        }
+      onAuthStateChange: (_callback) => {
+        void _callback;
         return {
           data: {
             subscription: {
@@ -151,6 +166,10 @@ function createMock(): SupabaseLike {
       signInWithOtp: (_params) => {
         void _params;
         return Promise.resolve({ data: null, error: null });
+      },
+      verifyOtp: (_params) => {
+        void _params;
+        return Promise.resolve({ data: { session: null }, error: null });
       },
       signOut: () => Promise.resolve({ data: null, error: null }),
     },

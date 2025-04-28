@@ -13,13 +13,14 @@ export default function Login() {
     setError("");
     setMessage("");
 
-    const { error } = await supabase.auth.signInWithOtp({ email });
+    const redirectTo = `${window.location.origin}/auth/callback`;
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { emailRedirectTo: redirectTo },
+    });
 
-    if (error) {
-      setError(error.message);
-    } else {
-      setMessage("Check your inbox. The magic link is on its way.");
-    }
+    if (error) setError(error.message);
+    else setMessage("Check your inbox. The magic link is on its way.");
   };
 
   return (
