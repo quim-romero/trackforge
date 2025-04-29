@@ -33,3 +33,16 @@ jobs:
           wait-on-timeout: 120
           browser: chrome
           headless: true
+
+      - name: Install LHCI
+        run: npm i -D @lhci/cli start-server-and-test
+
+      - name: Lighthouse (preview de build)
+        run: npx start-server-and-test "npm run preview -- --port 4173" http://localhost:4173 "npx lhci autorun --config=.lighthouserc.json"
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse
+          path: lhci
