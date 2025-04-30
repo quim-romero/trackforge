@@ -1,11 +1,15 @@
 export function ensureDemoSeed() {
   try {
+    if (typeof localStorage === "undefined") return;
     if (localStorage.getItem("demo-seeded")) return;
-    const existing = JSON.parse(localStorage.getItem("tasks") || "[]");
+
+    const raw = localStorage.getItem("tasks");
+    const existing = raw ? (JSON.parse(raw) as unknown) : [];
     if (Array.isArray(existing) && existing.length > 0) {
       localStorage.setItem("demo-seeded", "1");
       return;
     }
+
     const now = Date.now();
     const demo = [
       {
@@ -27,7 +31,10 @@ export function ensureDemoSeed() {
         createdAt: now,
       },
     ];
+
     localStorage.setItem("tasks", JSON.stringify(demo));
     localStorage.setItem("demo-seeded", "1");
-  } catch {}
+  } catch {
+    void 0;
+  }
 }
