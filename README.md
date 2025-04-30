@@ -95,6 +95,19 @@ Coming soon:
 
 ---
 
+## ♿ Accessibility & ⚡ Performance
+
+- **Accessibility:** automatic checks with `cypress-axe` (CI fails on **critical** violations).
+- **Performance:** Lighthouse (LHCI) runs against the production build.
+  _Goal: keep FCP/LCP in the green on the homepage._
+
+![Lighthouse](./public/lighthouse.png)
+
+> Generate locally with: `npm run build && npm run lh:report`  
+> Reports are saved to `./lhci/`.
+
+---
+
 ## 📸 Screenshots
 
 | Home                            | Dashboard                                 | Tasks                             |
