@@ -32,7 +32,6 @@ jobs:
           wait-on: http://localhost:5173
           wait-on-timeout: 120
           browser: chrome
-          headless: true
 
       - name: Install LHCI
         run: npm i -D @lhci/cli start-server-and-test

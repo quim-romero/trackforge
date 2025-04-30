@@ -4,9 +4,7 @@ describe("A11y - home", () => {
     cy.injectAxe();
 
     cy.configureAxe({
-      rules: {
-        "color-contrast": { enabled: false },
-      },
+      rules: [{ id: "color-contrast", enabled: false }],
     });
 
     cy.checkA11y(undefined, { includedImpacts: ["critical"] });
