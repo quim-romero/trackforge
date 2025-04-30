@@ -1,0 +1,14 @@
+[
+  {
+    "url": "http://localhost:63489/",
+    "isRepresentativeRun": true,
+    "htmlPath": "C:\\Users\\romer\\Music\\HECHO\\trackforge\\lhci\\localhost--2025_08_11_17_14_41.report.html",
+    "jsonPath": "C:\\Users\\romer\\Music\\HECHO\\trackforge\\lhci\\localhost--2025_08_11_17_14_41.report.json",
+    "summary": {
+      "performance": 0.89,
+      "accessibility": 0.96,
+      "best-practices": 0.96,
+      "seo": 1
+    }
+  }
+]

@@ -40,6 +40,11 @@ export default function Home() {
             src="/assets/landing-hero.svg"
             alt="Productivity illustration"
             className="w-full h-auto"
+            loading="eager"
+            fetchPriority="high"
+            decoding="async"
+            width={384}
+            height={374}
           />
         </div>
       </motion.section>

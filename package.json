@@ -11,8 +11,10 @@
     "cy:run": "cypress run --browser chrome --headless",
     "test:e2e": "start-server-and-test dev http://localhost:5173 cy:run",
     "test:e2e:open": "cypress open",
-    "e2e": "npm run test:e2e","analyze": "ANALYZE=1 vite build && echo 'Bundle report: dist/stats.html'",
-    "lhci:ci": "lhci autorun --config=.lighthouserc.json"
+    "e2e": "npm run test:e2e",
+    "analyze": "ANALYZE=1 vite build && echo 'Bundle report: dist/stats.html'",
+    "lhci:ci": "lhci autorun --config=.lighthouserc.json",
+    "lh:report": "lhci autorun --collect.staticDistDir=dist --upload.target=filesystem --upload.outputDir=lhci"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.1",
@@ -31,6 +33,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.32.0",
+    "@lhci/cli": "^0.15.1",
     "@types/react": "^19.1.9",
     "@types/react-dom": "^19.1.7",
     "@typescript-eslint/eslint-plugin": "^8.39.0",
