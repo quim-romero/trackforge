@@ -25,7 +25,9 @@ export default function Layout() {
             className="w-64 bg-white dark:bg-gray-900 p-4"
             onNavigate={() => setIsSidebarOpen(false)}
           />
-          <div
+          <button
+            type="button"
+            aria-label="Close sidebar"
             className="flex-1 bg-black/50"
             onClick={() => setIsSidebarOpen(false)}
           />
@@ -35,6 +37,8 @@ export default function Layout() {
       <div className="flex-1 flex flex-col">
         <header className="md:hidden flex items-center justify-between px-4 py-2 border-b border-gray-200 dark:border-gray-800">
           <button
+            type="button"
+            aria-label="Open sidebar"
             onClick={() => setIsSidebarOpen(true)}
             className="text-gray-700 dark:text-gray-300"
           >
@@ -43,6 +47,7 @@ export default function Layout() {
           <div className="flex gap-3 items-center">
             <ThemeToggle />
             <button
+              type="button"
               onClick={handleLogout}
               className="text-sm text-gray-500 dark:text-gray-400 hover:underline"
             >
@@ -51,10 +56,11 @@ export default function Layout() {
           </div>
         </header>
 
-        <main className="flex-1 p-4 md:p-6 space-y-6">
+        <div className="flex-1 p-4 md:p-6 space-y-6">
           <div className="hidden md:flex justify-end gap-3 items-center">
             <ThemeToggle />
             <button
+              type="button"
               onClick={handleLogout}
               className="text-sm text-gray-500 dark:text-gray-400 hover:underline"
             >
@@ -62,7 +68,7 @@ export default function Layout() {
             </button>
           </div>
           <Outlet />
-        </main>
+        </div>
       </div>
     </div>
   );
