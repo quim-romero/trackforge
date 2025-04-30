@@ -18,28 +18,35 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 export default function App() {
   return (
     <Router>
-      <Routes>
-        <Route element={<OnboardingLayout />}>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/about" element={<About />} />
-          <Route path="/auth/callback" element={<AuthCallback />} />
-        </Route>
+      <main
+        id="main-content"
+        role="main"
+        tabIndex={-1}
+        className="min-h-screen focus:outline-none"
+      >
+        <Routes>
+          <Route element={<OnboardingLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/about" element={<About />} />
+            <Route path="/auth/callback" element={<AuthCallback />} />
+          </Route>
 
-        <Route
-          element={
-            <ProtectedRoute>
-              <Layout />
-            </ProtectedRoute>
-          }
-        >
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/tasks" element={<Tasks />} />
-          <Route path="/stats" element={<Stats />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/settings" element={<Settings />} />
-        </Route>
-      </Routes>
+          <Route
+            element={
+              <ProtectedRoute>
+                <Layout />
+              </ProtectedRoute>
+            }
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/stats" element={<Stats />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/settings" element={<Settings />} />
+          </Route>
+        </Routes>
+      </main>
     </Router>
   );
 }
