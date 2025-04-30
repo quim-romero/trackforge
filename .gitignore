@@ -24,11 +24,16 @@ cypress/results/
 # Cypress cache (local only, managed by user system)
 .cypress/
 
+# Lighthouse CI reports (local)
+.lighthouseci/
+lhci/
+
 # VSCode
 .vscode/
 !.vscode/extensions.json
 
 # OS junk
+*.log
 .DS_Store
 Thumbs.db
 
