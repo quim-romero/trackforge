@@ -37,7 +37,9 @@ export function useAuth() {
         }
         setUser(session.user as AuthUser);
       }
-    })().catch(() => {});
+    })().catch(() => {
+      void 0;
+    });
 
     const {
       data: { subscription },
@@ -65,14 +67,18 @@ export function useAuth() {
     return () => {
       try {
         subscription.unsubscribe();
-      } catch {}
+      } catch {
+        void 0;
+      }
     };
   }, [setUser]);
 
   const logout = async () => {
     try {
       await supabase.auth.signOut();
-    } catch {}
+    } catch {
+      void 0;
+    }
     localStorage.removeItem("demo-user");
     setUser(null);
   };
