@@ -47,6 +47,7 @@ export default function AuthCallback() {
 
         if (session?.user) {
           if (!alive) return;
+          localStorage.removeItem("demo-user");
           setUser(session.user as AuthUser);
           navigate("/tasks", { replace: true });
         } else {

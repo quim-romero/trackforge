@@ -1,11 +1,11 @@
 [
   {
-    "url": "http://localhost:63902/",
+    "url": "http://localhost:64496/",
     "isRepresentativeRun": true,
-    "htmlPath": "C:\\Users\\romer\\Music\\HECHO\\trackforge\\lhci\\localhost--2025_08_11_17_39_59.report.html",
-    "jsonPath": "C:\\Users\\romer\\Music\\HECHO\\trackforge\\lhci\\localhost--2025_08_11_17_39_59.report.json",
+    "htmlPath": "C:\\Users\\romer\\Music\\HECHO\\trackforge\\lhci\\localhost--2025_08_11_18_31_37.report.html",
+    "jsonPath": "C:\\Users\\romer\\Music\\HECHO\\trackforge\\lhci\\localhost--2025_08_11_18_31_37.report.json",
     "summary": {
-      "performance": 0.91,
+      "performance": 0.89,
       "accessibility": 0.96,
       "best-practices": 0.96,
       "seo": 1
