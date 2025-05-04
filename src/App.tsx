@@ -1,19 +1,20 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Suspense, lazy } from "react";
+
 import Layout from "./components/Layout";
 import OnboardingLayout from "./components/OnboardingLayout";
-
-import Dashboard from "./pages/Dashboard";
-import Tasks from "./pages/Tasks";
-import Stats from "./pages/Stats";
-import Profile from "./pages/Profile";
-import Settings from "./pages/Settings";
-
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import About from "./pages/About";
-import AuthCallback from "./pages/AuthCallback";
-
 import ProtectedRoute from "./routes/ProtectedRoute";
+
+const Home = lazy(() => import("./pages/Home"));
+const Login = lazy(() => import("./pages/Login"));
+const About = lazy(() => import("./pages/About"));
+const AuthCallback = lazy(() => import("./pages/AuthCallback"));
+
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Tasks = lazy(() => import("./pages/Tasks"));
+const Stats = lazy(() => import("./pages/Stats"));
+const Profile = lazy(() => import("./pages/Profile"));
+const Settings = lazy(() => import("./pages/Settings"));
 
 export default function App() {
   return (
@@ -24,28 +25,30 @@ export default function App() {
         tabIndex={-1}
         className="min-h-screen focus:outline-none"
       >
-        <Routes>
-          <Route element={<OnboardingLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/auth/callback" element={<AuthCallback />} />
-          </Route>
+        <Suspense fallback={null}>
+          <Routes>
+            <Route element={<OnboardingLayout />}>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/auth/callback" element={<AuthCallback />} />
+            </Route>
 
-          <Route
-            element={
-              <ProtectedRoute>
-                <Layout />
-              </ProtectedRoute>
-            }
-          >
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/tasks" element={<Tasks />} />
-            <Route path="/stats" element={<Stats />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/settings" element={<Settings />} />
-          </Route>
-        </Routes>
+            <Route
+              element={
+                <ProtectedRoute>
+                  <Layout />
+                </ProtectedRoute>
+              }
+            >
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/tasks" element={<Tasks />} />
+              <Route path="/stats" element={<Stats />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/settings" element={<Settings />} />
+            </Route>
+          </Routes>
+        </Suspense>
       </main>
     </Router>
   );
