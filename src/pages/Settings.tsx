@@ -40,7 +40,7 @@ export default function Settings() {
         </p>
         {user?.id === "demo-user" && (
           <p className="mt-2 text-xs text-brand">
-            Demo mode: Clients & Projects se precargan automáticamente.
+            Demo mode: Clients & Projects are preloaded automatically.
           </p>
         )}
       </header>

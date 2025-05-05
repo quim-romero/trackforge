@@ -2,6 +2,32 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import type { Client, Project } from "../types";
 
+/* -----------------------------------------------------------
+ * Helpers
+ * ----------------------------------------------------------- */
+
+const STAGES: ReadonlyArray<Project["stage"]> = [
+  "all",
+  "in-progress",
+  "review",
+  "done",
+] as const;
+
+function isStage(v: unknown): v is Project["stage"] {
+  return typeof v === "string" && (STAGES as readonly string[]).includes(v);
+}
+
+function safeUuid(): string {
+  try {
+    if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
+  } catch {}
+  return "id-" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+}
+
+/* -----------------------------------------------------------
+ * Demo data
+ * ----------------------------------------------------------- */
+
 const DEMO_CLIENTS: Client[] = [
   {
     id: "demo-client-1",
@@ -44,13 +70,21 @@ const DEMO_PROJECTS: Project[] = [
   },
 ];
 
+/* -----------------------------------------------------------
+ * State
+ * ----------------------------------------------------------- */
+
 interface BusinessState {
   clients: Client[];
   projects: Project[];
   businessMode: boolean;
 
+  // Clients
   addClient: (client: Omit<Client, "id" | "createdAt">) => void;
+  updateClient: (id: string, patch: Partial<Client>) => void;
+  deleteClient: (id: string) => void;
 
+  // Projects
   addProject: (project: Omit<Project, "id" | "createdAt">) => void;
   updateProject: (id: string, patch: Partial<Project>) => void;
   deleteProject: (id: string) => void;
@@ -63,10 +97,16 @@ interface BusinessState {
 
   reorderInStage: (stage: Project["stage"], from: number, to: number) => void;
 
+  // Misc
   toggleBusinessMode: () => void;
   loadDemoData: () => void;
   clearData: () => void;
+  reset: () => void;
 }
+
+/* -----------------------------------------------------------
+ * Store
+ * ----------------------------------------------------------- */
 
 export const useBusinessStore = create<BusinessState>()(
   persist(
@@ -75,25 +115,39 @@ export const useBusinessStore = create<BusinessState>()(
       projects: [],
       businessMode: false,
 
+      /* ----------------------- Clients ----------------------- */
       addClient: (client) =>
         set((state) => ({
           clients: [
             ...state.clients,
             {
               ...client,
-              id: crypto.randomUUID(),
+              id: safeUuid(),
               createdAt: new Date().toISOString(),
             },
           ],
         })),
 
+      updateClient: (id, patch) =>
+        set((state) => ({
+          clients: state.clients.map((c) =>
+            c.id === id ? { ...c, ...patch } : c
+          ),
+        })),
+
+      deleteClient: (id) =>
+        set((state) => ({
+          clients: state.clients.filter((c) => c.id !== id),
+        })),
+
+      /* ----------------------- Projects ---------------------- */
       addProject: (project) =>
         set((state) => ({
           projects: [
             ...state.projects,
             {
               ...project,
-              id: crypto.randomUUID(),
+              id: safeUuid(),
               createdAt: new Date().toISOString(),
             },
           ],
@@ -113,20 +167,29 @@ export const useBusinessStore = create<BusinessState>()(
 
       moveProject: (id, nextStage, index) =>
         set((state) => {
-          const projects = [...state.projects];
-          const i = projects.findIndex((p) => p.id === id);
-          if (i === -1) return { projects };
+          if (!isStage(nextStage)) return { projects: state.projects };
 
-          const [item] = projects.splice(i, 1);
+          const current = state.projects.find((p) => p.id === id);
+          if (!current) return { projects: state.projects };
+          const sameStage = current.stage === nextStage;
+
+          const projects = [...state.projects];
+
+          const fromIndex = projects.findIndex((p) => p.id === id);
+          if (fromIndex === -1) return { projects: state.projects };
+
+          const [item] = projects.splice(fromIndex, 1);
           item.stage = nextStage;
 
           const before = projects.filter((p) => p.stage !== nextStage);
           const column = projects.filter((p) => p.stage === nextStage);
 
-          const insertAt = Math.max(
-            0,
-            Math.min(index ?? column.length, column.length)
-          );
+          const insertAt = Number.isFinite(index as number)
+            ? Math.max(0, Math.min(index as number, column.length))
+            : column.length;
+
+          if (sameStage && insertAt === column.length) {
+          }
 
           const rebuilt: Project[] = [
             ...before,
@@ -140,30 +203,37 @@ export const useBusinessStore = create<BusinessState>()(
 
       reorderInStage: (stage, from, to) =>
         set((state) => {
-          const others = state.projects.filter((p) => p.stage !== stage);
-          const column = state.projects
-            .filter((p) => p.stage === stage)
-            .sort(
-              (a, b) =>
-                state.projects.findIndex((p) => p.id === a.id) -
-                state.projects.findIndex((p) => p.id === b.id)
-            );
+          if (!isStage(stage)) return { projects: state.projects };
+
+          const projects = state.projects;
+          const column = projects
+            .map((p, i) => ({ p, i }))
+            .filter(({ p }) => p.stage === stage)
+            .sort((a, b) => a.i - b.i)
+            .map(({ p }) => p);
+
+          const others = projects.filter((p) => p.stage !== stage);
 
           if (
+            from === to ||
             from < 0 ||
-            from >= column.length ||
             to < 0 ||
+            from >= column.length ||
             to >= column.length
           ) {
             return { projects: state.projects };
           }
 
-          const [moved] = column.splice(from, 1);
-          column.splice(to, 0, moved);
+          const nextColumn = [...column];
+          const [moved] = nextColumn.splice(from, 1);
+          nextColumn.splice(to, 0, moved);
 
-          return { projects: [...others, ...column] };
+          const rebuilt: Project[] = [...others, ...nextColumn];
+
+          return { projects: rebuilt };
         }),
 
+      /* ------------------------ Misc ------------------------- */
       toggleBusinessMode: () =>
         set((state) => ({
           businessMode: !state.businessMode,
@@ -177,6 +247,13 @@ export const useBusinessStore = create<BusinessState>()(
         })),
 
       clearData: () =>
+        set(() => ({
+          clients: [],
+          projects: [],
+          businessMode: false,
+        })),
+
+      reset: () =>
         set(() => ({
           clients: [],
           projects: [],
