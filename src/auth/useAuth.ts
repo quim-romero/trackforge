@@ -143,13 +143,15 @@ export function useAuth() {
     localStorage.removeItem(DEMO_HYDRATED_KEY);
 
     try {
-      const reset = (useBusinessStore.getState() as any).reset;
+      const reset = (useBusinessStore.getState() as { reset?: () => void }).reset
       if (typeof reset === "function") {
         reset();
       } else {
         useBusinessStore.setState({ clients: [], projects: [] });
       }
-    } catch {}
+    } catch {
+      // ignore
+    }
 
     setUser(null);
   };

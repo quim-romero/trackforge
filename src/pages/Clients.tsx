@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useBusinessStore } from "../store/useBusinessStore";
 import { useSettingsStore } from "../store/useSettingsStore";
 import { Pencil, Trash2, Plus } from "lucide-react";
+import type { Client } from "../types";
 
 type FormValues = {
   name: string;
@@ -191,7 +192,7 @@ export default function Clients() {
     setEditing(null);
     setShowModal(true);
   };
-  const openEdit = (c: any) => {
+  const openEdit = (c: Client) => {
     setEditing(c);
     setShowModal(true);
   };

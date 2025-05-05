@@ -20,7 +20,9 @@ function isStage(v: unknown): v is Project["stage"] {
 function safeUuid(): string {
   try {
     if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
-  } catch {}
+  } catch {
+    // fallback to Math.random below
+  }
   return "id-" + Math.random().toString(36).slice(2) + Date.now().toString(36);
 }
 
@@ -189,6 +191,7 @@ export const useBusinessStore = create<BusinessState>()(
             : column.length;
 
           if (sameStage && insertAt === column.length) {
+            // no-op: item is already at the end
           }
 
           const rebuilt: Project[] = [
