@@ -31,7 +31,7 @@ export default function AuthCallback() {
             const result = await supabase.auth.verifyOtp(verifyParams);
 
             if (!result || ("error" in result && result.error)) {
-              throw new Error("No se pudo verificar el enlace.");
+              throw new Error("The link could not be verified.");
             }
 
             session = result.data?.session ?? null;
@@ -49,12 +49,12 @@ export default function AuthCallback() {
           if (!alive) return;
           localStorage.removeItem("demo-user");
           setUser(session.user as AuthUser);
-          navigate("/tasks", { replace: true });
+          navigate("/dashboard", { replace: true });
         } else {
-          throw new Error("No se pudo iniciar sesión.");
+          throw new Error("Failed to log in.");
         }
       } catch (e) {
-        const msg = e instanceof Error ? e.message : "Error iniciando sesión.";
+        const msg = e instanceof Error ? e.message : "Error logging in.";
         if (alive) setError(msg);
       }
     })();

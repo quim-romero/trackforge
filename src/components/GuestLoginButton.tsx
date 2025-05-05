@@ -13,7 +13,7 @@ export default function GuestLoginButton({
     const guest = { id: "demo-user", email: "guest@demo.local", name: "Guest" };
     localStorage.setItem("demo-user", JSON.stringify(guest));
     setUser(guest);
-    navigate("/tasks");
+    navigate("/dashboard");
   };
 
   return (
