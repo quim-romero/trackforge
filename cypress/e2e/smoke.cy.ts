@@ -16,10 +16,7 @@ describe("TrackForge - smoke", () => {
       expect(p).to.not.match(/\/login$/);
     });
 
-    cy.location().then((loc) => {
-      const base = `${loc.pathname}${loc.search ? "" : ""}`;
-      cy.visit(`${base}?new=1`);
-    });
+    cy.visit("/tasks?new=1");
 
     cy.get('[data-cy="add-task-modal"]', { timeout: 10000 }).should(
       "be.visible"
