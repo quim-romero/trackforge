@@ -8,15 +8,16 @@
 
 ## 🧭 About TrackForge
 
-**TrackForge** isn’t just another task manager — it’s a **focused productivity environment** designed for makers who move with intent.
+**TrackForge** is a **focused productivity environment** — a quiet alternative to noisy task managers, built for makers who value clarity over chaos.
 
-Built to be minimal, fast, and intentional, it offers:
+Minimal, fast, and intentional, it provides:
 
-- ✍️ Task management with filters, priorities, and inline editing  
-- 🎯 UI settings for density, theme, and motion preferences (persisted locally)  
-- 🔐 Passwordless login via magic link (Supabase Auth)  
-- 📈 Visual stats to track weekly momentum  
-- 🧪 CI-integrated E2E testing for reliability and flow  
+- ✍️ Task management with filters, priorities, inline editing
+- 🎯 Customizable UI density, theme, and motion preferences (persisted locally)
+- 🔐 Passwordless login via Supabase (magic link) + guest/demo mode
+- 👥 Business mode for **clients & projects** management with Kanban workflow
+- 📈 Visual stats for weekly momentum and productivity tracking
+- 🧪 Automated E2E testing integrated with CI for reliability
 
 ---
 
@@ -28,69 +29,77 @@ Built to be minimal, fast, and intentional, it offers:
 
 ## ✨ Features
 
-- ✅ Add, edit, delete, complete, and filter tasks  
-- 🎛️ Switch between **comfortable** and **compact** layout density  
-- 🌗 Light/dark mode with system preference detection  
-- 🌀 Toggle animations for users who prefer reduced motion  
-- 📬 Passwordless authentication (magic link via email)  
-- 📊 Chart-based stats of tasks completed during the week  
-- 📱 Fully responsive and mobile-ready  
-- 🧪 Automated end-to-end tests (Cypress + GitHub Actions)  
+- ✅ Add, edit, delete, complete, and filter tasks
+- 🔎 Filter by **status** (active, completed) and **priority** (low, medium, high)
+- 🗂️ Manage **Clients** & **Projects** in business mode (with Kanban drag & drop)
+- 🎛️ Toggle between **comfortable** and **compact** layouts
+- 🌗 Light/dark theme with system preference detection
+- 🌀 Reduced motion mode for accessible, distraction-free use
+- 📬 Passwordless authentication (magic link) or **guest login**
+- 📊 Weekly stats dashboard with completion charts
+- 📱 Fully responsive, mobile-first design
+- ♿ Accessibility checks baked into CI (cypress-axe)
+- 🧪 E2E tests (Cypress + GitHub Actions) for critical flows
 
 ---
 
 ## 🧠 Tech Stack
 
-| Tech                      | Role                              |
-| ------------------------- | --------------------------------- |
-| **React + TypeScript**    | Core frontend framework           |
-| **Zustand**               | Global state management           |
-| **Supabase**              | Auth + database backend           |
-| **Framer Motion**         | Animations and layout transitions |
-| **Tailwind CSS**          | Design system and theming         |
-| **React Hook Form + Zod** | Forms and validation              |
-| **Chart.js**              | Task completion statistics        |
-| **Vite**                  | Build tool and dev server         |
-| **Cypress**               | E2E testing                       |
-| **GitHub Actions**        | Continuous integration            |
+| Tech                           | Role                                |
+| ------------------------------ | ----------------------------------- |
+| **React + TypeScript**         | Core frontend framework             |
+| **React Router v7**            | Routing and navigation              |
+| **Zustand**                    | State management (persisted slices) |
+| **Supabase**                   | Auth + Postgres database            |
+| **Framer Motion**              | UI animations and transitions       |
+| **Tailwind CSS**               | Styling and theming                 |
+| **Lucide React**               | Icon system                         |
+| **React Hook Form + Zod**      | Forms and validation                |
+| **Chart.js + react-chartjs-2** | Weekly task completion stats        |
+| **Day.js**                     | Date handling                       |
+| **Vite**                       | Dev server + build tool             |
+| **Cypress**                    | End-to-end testing                  |
+| **GitHub Actions**             | CI/CD pipeline                      |
+| **Lighthouse CI**              | Performance audits                  |
 
 ---
 
 ## 🗂 Project Structure
 
-- `src/`  
-  - `auth/` – Supabase session management  
-  - `components/` – UI components (modals, cards, layout)  
-  - `hooks/` – Reusable logic (tasks, auth)  
-  - `pages/` – Views like Dashboard, Tasks, Profile  
-  - `routes/` – Route protection and layout shells  
-  - `store/` – Zustand slices (theme, user, settings)  
-  - `styles/` – Tailwind config and tweaks  
-  - `types/` – Shared TypeScript types  
-- `cypress/` – E2E test specs and config  
-- `public/` – Meta tags, icons, favicon  
+- `src/`
+  - `auth/` – Supabase integration, session, and mock client
+  - `components/` – UI (cards, modals, sidebar, layout)
+  - `hooks/` – Business logic (tasks, projects, auth)
+  - `pages/` – Views (Dashboard, Tasks, Stats, Clients, Projects, etc.)
+  - `routes/` – Public/private routes with protection
+  - `store/` – Zustand slices (user, theme, settings, tasks, business data)
+  - `types/` – Shared TypeScript types (Task, Client, Project)
+  - `styles/` – Tailwind setup and overrides
+- `cypress/` – Test specs, helpers, a11y checks
+- `public/` – Static assets (icons, meta, manifest, illustrations)
 
 ---
 
 ## 🧪 End-to-End Testing
 
-TrackForge uses **Cypress** for reliable E2E testing, with each PR and push to `main` running checks via **GitHub Actions**.
+TrackForge uses **Cypress** for smoke tests, accessibility checks, and core flows, running automatically on **every PR and push to `main`**.
 
 **Currently tested**
 
-- ✅ Home page headline renders  
-- ✅ Task creation, completion, filtering, editing, deletion  
-- ✅ UI settings: theme toggle, animation toggle, layout density  
+- ✅ Guest login → create task → view in list
+- ✅ Task lifecycle: create, update, complete, delete
+- ✅ Filters: status + priority
+- ✅ UI preferences: theme, density, animations
+- ✅ Home page & accessibility checks
 
-**Coming soon**
+**Planned coverage**
 
-- 🖱️ Modal interactions and task quick actions  
-- 🧭 Filtering by status and priority (edge cases)  
-- 🔐 Passwordless login (Supabase magic link) end-to-end  
-- 📊 Weekly stats chart updates after completing tasks  
-- ♿ Accessibility audits  
+- 🖱️ Rich modal interactions
+- 🧭 Client/project Kanban actions
+- 🔐 Full Supabase magic link auth flow
+- 📊 Dashboard and stats updates after actions
 
-🧪 **CI status:** https://github.com/quim-romero/trackforge/actions
+👉 CI status: https://github.com/quim-romero/trackforge/actions
 
 ---
 
@@ -98,29 +107,28 @@ TrackForge uses **Cypress** for reliable E2E testing, with each PR and push to `
 
 **Accessibility**
 
-- Automated checks with **cypress-axe** (CI fails on **critical** violations).
+- Automated via **cypress-axe**
+- CI fails on **critical** violations
 
 **Performance**
 
-- Lighthouse (LHCI) runs against the production build.  
-  _Goal: keep FCP/LCP in the green on the homepage._
+- Audited via **Lighthouse CI** (LHCI)
+- Goal: keep **FCP/LCP in green** on key views
 
-![Lighthouse](./public/lighthouse.png)
-
-**Run locally (essentials)**
+Run locally:
 
 ```bash
-# Accessibility (headless)
+# Accessibility checks
 npm run test:a11y
 
 # Cypress (interactive)
-npx cypress open
+npm run test:e2e:open
 
-# Lighthouse report (after build)
+# Lighthouse report
 npm run build && npm run lh:report
 ```
 
-Reports are saved to `./lhci/`.
+Reports are saved under `./lhci/`.
 
 ---
 
@@ -134,20 +142,21 @@ Reports are saved to `./lhci/`.
 
 ## 🧩 Notes
 
-- 🧠 100% hand-coded — no UI libraries or templates  
-- 🧼 Prioritizes **clarity and control** over visual clutter  
-- ⚡ Built for speed, responsiveness, and accessibility  
-- 🛠 Built as a **developer portfolio project**, not a production SaaS  
+- 💡 Supports **guest/demo mode** (offline, seeded data)
+- 🧠 100% hand-coded UI (no component libraries)
+- 🧼 Designed for **clarity and control**
+- ⚡ Optimized for speed, responsiveness, accessibility
+- 🛠 Built as a **developer portfolio project**, not a production SaaS
 
 ---
 
 ## 📬 Contact
 
-If you're looking for a frontend developer who builds **clean, purposeful, performant** interfaces:
+If you're looking for a frontend engineer who builds **clean, purposeful, performant** apps:
 
-- 📧 quim@quimromero.com  
+- 📧 quim@quimromero.com
 - 🌐 https://quimromero.com
 
 ---
 
-> _TrackForge is a quiet rebellion against noisy software — built for makers who value clarity over chaos._
+> _TrackForge is a quiet rebellion against noisy software — built for makers who move with intent._
